@@ -8,89 +8,60 @@ import { sanitizeFile } from '@/lib/sanitize';
 
 export async function GET(request: Request) {
   try {
-    const { dbUser } = await requireAuth();
+    const { dbUser } = await requireAuth()
+    
+    const { searchParams } = new URL(request.url)
+    const q = searchParams.get('q')
+    const folderId = searchParams.get('folderId')
+    const type = searchParams.get('type')
+    const sort = searchParams.get('sort') ?? 'date'
 
-    const { searchParams } = new URL(request.url);
-    const q = searchParams.get('q')?.toLowerCase();
-    const folderId = searchParams.get('folderId');
-    const type = searchParams.get('type');
-
-    // Build Prisma query dynamically
     const where: Prisma.FileWhereInput = {
       userId: dbUser.id,
-      deletedAt: null, // Don't show files in trash
-    };
-
-    if (q) {
-      where.filename = { contains: q, mode: 'insensitive' };
+      deletedAt: null,
+      ...(folderId ? { folderId } : {}),
+      ...(type ? { filetype: { contains: type, mode: 'insensitive' } } : {}),
+      ...(q ? { filename: { contains: q, mode: 'insensitive' } } : {}),
     }
 
-    if (folderId === 'root') {
-      where.folderId = null;
-    } else if (folderId) {
-      where.folderId = folderId;
-    }
+    const orderBy: Prisma.FileOrderByWithRelationInput =
+      sort === 'name' ? { filename: 'asc' } :
+      sort === 'size' ? { size: 'desc' } :
+      { createdAt: 'desc' }
 
-    if (type) {
-      where.filetype = { contains: type, mode: 'insensitive' };
-    }
-
-    const [files, summary] = await Promise.all([
-      prisma.file.findMany({
-        where,
-        select: {
-          id: true,
-          filename: true,
-          filetype: true,
-          size: true,
-          createdAt: true,
-          updatedAt: true,
-          folderId: true,
-          tags: true,
-          deletedAt: true,
-          folder: { select: { id: true, name: true } },
-          _count: { select: { versions: true } },
-          starredBy: {
-            where: { userId: dbUser.id },
-            select: { id: true }
-          }
-        },
-        orderBy: { createdAt: 'desc' },
-      }),
-      prisma.file.aggregate({
-        where: { userId: dbUser.id, deletedAt: null },
-        _sum: { size: true },
-        _count: { id: true },
-      }),
-    ]);
-
-    const formattedFiles = files.map(f => ({
-      ...f,
-      isStarred: f.starredBy.length > 0,
-    }));
-
-    // Generate byType breakdown
-    const byTypeData = await prisma.file.groupBy({
-      by: ['filetype'],
-      where: { userId: dbUser.id, deletedAt: null },
-      _count: { id: true },
-      _sum: { size: true },
-    });
-
-    const byType = byTypeData.reduce((acc, curr) => {
-      acc[curr.filetype] = curr._sum.size || 0;
-      return acc;
-    }, {} as Record<string, number>);
-
-    return NextResponse.json({
-      files: formattedFiles,
-      storage: {
-        totalBytes: summary._sum.size || 0,
-        fileCount: summary._count.id || 0,
-        byType,
+    const files = await prisma.file.findMany({
+      where,
+      orderBy,
+      include: {
+        folder: { select: { id: true, name: true } },
+        _count: { select: { versions: true } },
+        starredBy: { where: { userId: dbUser.id }, select: { id: true } },
       },
-    });
-  } catch (error) {
-    return handleApiError(error);
+    })
+
+    const mapped = files.map(f => ({
+      ...f,
+      storagePath: undefined,  // never expose storage path
+      isStarred: f.starredBy.length > 0,
+      starredBy: undefined,
+    }))
+
+    const allFiles = await prisma.file.findMany({
+      where: { userId: dbUser.id, deletedAt: null },
+      select: { size: true, filetype: true }
+    })
+
+    const summary = {
+      totalBytes: allFiles.reduce((sum, f) => sum + f.size, 0),
+      fileCount: allFiles.length,
+      byType: allFiles.reduce((acc, f) => {
+        acc[f.filetype] = (acc[f.filetype] || 0) + f.size
+        return acc
+      }, {} as Record<string, number>)
+    }
+
+    return Response.json({ files: mapped, storage: summary })
+  } catch (err) {
+    return handleApiError(err)
   }
 }
