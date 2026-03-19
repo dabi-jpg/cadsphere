@@ -3,6 +3,7 @@ import { requireAuth } from '@/lib/auth';
 import { handleApiError } from '@/lib/api-error';
 import { prisma } from '@/lib/prisma';
 import { differenceInDays } from 'date-fns';
+import { sanitizeFile } from '@/lib/sanitize';
 
 export async function GET(request: Request) {
   try {
@@ -13,7 +14,16 @@ export async function GET(request: Request) {
         userId: dbUser.id,
         deletedAt: { not: null },
       },
-      include: {
+      select: {
+        id: true,
+        filename: true,
+        filetype: true,
+        size: true,
+        createdAt: true,
+        updatedAt: true,
+        deletedAt: true,
+        folderId: true,
+        tags: true,
         folder: { select: { name: true } },
       },
       orderBy: { deletedAt: 'desc' },

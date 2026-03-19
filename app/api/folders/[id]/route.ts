@@ -4,10 +4,11 @@ import { requireAuth } from '@/lib/auth';
 import { handleApiError, ApiError } from '@/lib/api-error';
 import { prisma } from '@/lib/prisma';
 import { logActivity } from '@/lib/activity';
+import { uuidSchema } from '@/lib/validation';
 
 const updateFolderSchema = z.object({
-  name: z.string().min(1).optional(),
-  parentId: z.string().nullable().optional(),
+  name: z.string().min(1).max(100).trim().optional(),
+  parentId: z.string().uuid().nullable().optional(),
 });
 
 export async function PATCH(
@@ -18,19 +19,32 @@ export async function PATCH(
     const { dbUser } = await requireAuth();
     const resolvedParams = await params;
     const folderId = resolvedParams.id;
-    const body = await request.json();
-    const data = updateFolderSchema.parse(body);
+
+    if (!uuidSchema.safeParse(folderId).success) {
+      throw new ApiError('Invalid folder ID', 'VALIDATION_ERROR', 400);
+    }
+
+    const body = await request.json().catch(() => null);
+    if (!body) {
+      throw new ApiError('Invalid JSON', 'INVALID_BODY', 400);
+    }
+
+    const parsed = updateFolderSchema.safeParse(body);
+    if (!parsed.success) {
+      throw new ApiError(parsed.error.issues[0]?.message || 'Validation error', 'VALIDATION_ERROR', 400);
+    }
+    const data = parsed.data;
 
     const folder = await prisma.folder.findUnique({
-      where: { id: folderId },
+      where: { id: folderId, userId: dbUser.id },
     });
 
-    if (!folder || folder.userId !== dbUser.id) {
+    if (!folder) {
       throw new ApiError('Folder not found', 'NOT_FOUND', 404);
     }
 
     if (data.parentId) {
-      // Prevent circular logic simply (could be more robust)
+      // Prevent circular logic
       if (data.parentId === folderId) {
         throw new ApiError('Cannot move folder into itself', 'BAD_REQUEST', 400);
       }
@@ -71,11 +85,15 @@ export async function DELETE(
     const resolvedParams = await params;
     const folderId = resolvedParams.id;
 
+    if (!uuidSchema.safeParse(folderId).success) {
+      throw new ApiError('Invalid folder ID', 'VALIDATION_ERROR', 400);
+    }
+
     const folder = await prisma.folder.findUnique({
-      where: { id: folderId },
+      where: { id: folderId, userId: dbUser.id },
     });
 
-    if (!folder || folder.userId !== dbUser.id) {
+    if (!folder) {
       throw new ApiError('Folder not found', 'NOT_FOUND', 404);
     }
 

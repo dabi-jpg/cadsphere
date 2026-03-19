@@ -3,6 +3,7 @@ import { requireAuth } from '@/lib/auth';
 import { handleApiError, ApiError } from '@/lib/api-error';
 import { prisma } from '@/lib/prisma';
 import { logActivity } from '@/lib/activity';
+import { uuidSchema } from '@/lib/validation';
 
 export async function DELETE(
   request: Request,
@@ -14,9 +15,14 @@ export async function DELETE(
     const fileId = resolvedParams.id;
     const commentId = resolvedParams.commentId;
 
+    // Validate UUID params
+    if (!uuidSchema.safeParse(fileId).success || !uuidSchema.safeParse(commentId).success) {
+      throw new ApiError('Invalid ID format', 'VALIDATION_ERROR', 400);
+    }
+
     const comment = await prisma.fileComment.findUnique({
       where: { id: commentId, fileId },
-      include: { file: true },
+      include: { file: { select: { userId: true } } },
     });
 
     if (!comment) {

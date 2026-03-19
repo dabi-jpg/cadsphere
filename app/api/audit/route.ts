@@ -1,15 +1,16 @@
 /**
  * GET /api/audit — List audit logs for the authenticated user (paginated)
+ * 
+ * SECURITY: Uses requireAuth() instead of raw Supabase auth.
  */
-import { createSupabaseServerClient } from "@/lib/supabase-server";
+import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Errors, successResponse } from "@/lib/api-error";
+import { handleApiError } from "@/lib/api-error";
+import { successResponse } from "@/lib/api-error";
 
 export async function GET(request: Request) {
   try {
-    const supabase = await createSupabaseServerClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) return Errors.unauthorized();
+    const { dbUser } = await requireAuth();
 
     const { searchParams } = new URL(request.url);
     const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
@@ -27,10 +28,10 @@ export async function GET(request: Request) {
          WHERE al.user_id = $1
          ORDER BY al.created_at DESC
          LIMIT $2 OFFSET $3`,
-        user.id, limit, offset
+        dbUser.id, limit, offset
       ),
       prisma.$queryRawUnsafe<Array<{ count: string }>>(
-        `SELECT COUNT(*)::text as count FROM audit_logs WHERE user_id = $1`, user.id
+        `SELECT COUNT(*)::text as count FROM audit_logs WHERE user_id = $1`, dbUser.id
       ),
     ]);
 
@@ -48,7 +49,6 @@ export async function GET(request: Request) {
       pagination: { page, limit, total, total_pages: Math.ceil(total / limit) },
     });
   } catch (error) {
-    console.error("Audit log error:", error);
-    return Errors.internal();
+    return handleApiError(error);
   }
 }

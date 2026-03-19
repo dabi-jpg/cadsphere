@@ -98,3 +98,31 @@ export const uploadFileSchema = z.object({
   message: `Invalid file type. Allowed: ${ALLOWED_EXTENSIONS_DISPLAY}`,
   path: ["filename"],
 });
+
+/** Folder creation */
+export const createFolderSchema = z.object({
+  name: z.string().min(1).max(100).trim(),
+  parentId: z.string().uuid().optional().nullable(),
+});
+
+/** File update (rename, move, tags) */
+export const updateFileSchema = z.object({
+  filename: z.string().min(1).max(255).trim().optional(),
+  folderId: z.string().uuid().optional().nullable(),
+  tags: z.array(z.string().max(50)).max(20).optional(),
+});
+
+/** Comment creation */
+export const createCommentSchema = z.object({
+  body: z.string().min(1).max(2000).trim(),
+});
+
+/** File sharing */
+export const shareFileSchema = z.object({
+  fileId: z.string().uuid(),
+  sharedWithEmail: z.string().email().max(255).toLowerCase().trim(),
+  permission: z.enum(['VIEWER', 'EDITOR']),
+});
+
+/** UUID param validation — prevents SQL injection via URL params */
+export const uuidSchema = z.string().uuid();

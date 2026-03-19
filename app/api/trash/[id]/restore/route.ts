@@ -3,6 +3,8 @@ import { requireAuth } from '@/lib/auth';
 import { handleApiError, ApiError } from '@/lib/api-error';
 import { prisma } from '@/lib/prisma';
 import { logActivity } from '@/lib/activity';
+import { uuidSchema } from '@/lib/validation';
+import { sanitizeFile } from '@/lib/sanitize';
 
 export async function POST(
   request: Request,
@@ -13,11 +15,15 @@ export async function POST(
     const resolvedParams = await params;
     const fileId = resolvedParams.id;
 
+    if (!uuidSchema.safeParse(fileId).success) {
+      throw new ApiError('Invalid file ID', 'VALIDATION_ERROR', 400);
+    }
+
     const file = await prisma.file.findUnique({
-      where: { id: fileId },
+      where: { id: fileId, userId: dbUser.id },
     });
 
-    if (!file || file.userId !== dbUser.id) {
+    if (!file) {
       throw new ApiError('File not found', 'NOT_FOUND', 404);
     }
 
@@ -42,7 +48,7 @@ export async function POST(
       metadata: { filename: file.filename },
     });
 
-    return NextResponse.json(restoredFile);
+    return NextResponse.json(sanitizeFile(restoredFile as unknown as Record<string, unknown>));
   } catch (error) {
     return handleApiError(error);
   }

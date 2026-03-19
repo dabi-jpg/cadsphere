@@ -4,6 +4,7 @@ import { requireAuth } from '@/lib/auth';
 import { handleApiError, ApiError } from '@/lib/api-error';
 import { prisma } from '@/lib/prisma';
 import { logActivity } from '@/lib/activity';
+import { rateLimit } from '@/lib/rate-limit';
 
 const shareSchema = z.object({
   fileId: z.string().min(1),
@@ -89,6 +90,20 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const { dbUser } = await requireAuth();
+
+    // Rate limit: 30 shares per hour per user
+    const limit = rateLimit({
+      key: `share:${dbUser.id}`,
+      limit: 30,
+      windowMs: 60 * 60 * 1000,
+    });
+    if (!limit.success) {
+      return Response.json(
+        { error: 'Too many requests. Please try again later.', code: 'RATE_LIMITED' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil((limit.resetAt - Date.now()) / 1000)) } }
+      );
+    }
+
     const body = await request.json().catch(() => null);
     if (!body) {
       throw new ApiError('Invalid JSON', 'INVALID_BODY', 400);

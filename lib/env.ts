@@ -1,33 +1,24 @@
 /**
  * Environment variable validation.
- *
- * Validates required env vars at startup / import time so the app
- * fails fast with a clear message instead of crashing mid-request.
+ * SECURITY: Validates all required env vars at startup using Zod.
+ * Fails fast with clear error messages if configuration is invalid.
  */
+import { z } from 'zod';
 
-function required(name: string): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(
-      `❌ Missing required environment variable: ${name}\n` +
-      `   Check your .env file or deployment configuration.`
-    );
-  }
-  return value;
+const envSchema = z.object({
+  DATABASE_URL: z.string().min(1),
+  NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+});
+
+const parsed = envSchema.safeParse(process.env);
+
+if (!parsed.success) {
+  console.error('Missing or invalid environment variables:');
+  parsed.error.issues.forEach((e) => console.error(`  ${String(e.path.join('.'))}: ${e.message}`));
+  throw new Error('Invalid environment configuration. Server cannot start.');
 }
 
-/** Public (browser-safe) env vars */
-export const env = {
-  /** Supabase project URL */
-  NEXT_PUBLIC_SUPABASE_URL: required("NEXT_PUBLIC_SUPABASE_URL"),
-  /** Supabase anonymous/public key */
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: required("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
-} as const;
-
-/** Server-only env vars — only import this in server-side code */
-export const serverEnv = {
-  /** Supabase service role key (admin) */
-  SUPABASE_SERVICE_ROLE_KEY: required("SUPABASE_SERVICE_ROLE_KEY"),
-  /** Prisma database connection string */
-  DATABASE_URL: required("DATABASE_URL"),
-} as const;
+export const env = parsed.data;

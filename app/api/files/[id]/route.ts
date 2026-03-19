@@ -1,15 +1,10 @@
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
 import { requireAuth } from '@/lib/auth';
 import { handleApiError, ApiError } from '@/lib/api-error';
 import { prisma } from '@/lib/prisma';
-import { deleteFromStorage } from '@/lib/storage';
 import { logActivity } from '@/lib/activity';
-
-const updateFileSchema = z.object({
-  filename: z.string().min(1).optional(),
-  folderId: z.string().nullable().optional(),
-});
+import { uuidSchema, updateFileSchema } from '@/lib/validation';
+import { sanitizeFile } from '@/lib/sanitize';
 
 export async function PATCH(
   request: Request,
@@ -19,15 +14,28 @@ export async function PATCH(
     const { dbUser } = await requireAuth();
     const resolvedParams = await params;
     const fileId = resolvedParams.id;
-    const body = await request.json();
-    
-    const data = updateFileSchema.parse(body);
+
+    // Validate UUID param
+    if (!uuidSchema.safeParse(fileId).success) {
+      throw new ApiError('Invalid file ID', 'VALIDATION_ERROR', 400);
+    }
+
+    const body = await request.json().catch(() => null);
+    if (!body) {
+      throw new ApiError('Invalid JSON', 'INVALID_BODY', 400);
+    }
+
+    const parsed = updateFileSchema.safeParse(body);
+    if (!parsed.success) {
+      throw new ApiError(parsed.error.issues[0]?.message || 'Validation error', 'VALIDATION_ERROR', 400);
+    }
+    const data = parsed.data;
 
     const file = await prisma.file.findUnique({
-      where: { id: fileId },
+      where: { id: fileId, userId: dbUser.id },
     });
 
-    if (!file || file.userId !== dbUser.id) {
+    if (!file) {
       throw new ApiError('File not found or forbidden', 'NOT_FOUND', 404);
     }
 
@@ -52,7 +60,7 @@ export async function PATCH(
       metadata: { changes: Object.keys(data) },
     });
 
-    return NextResponse.json(updatedFile);
+    return NextResponse.json(sanitizeFile(updatedFile as unknown as Record<string, unknown>));
   } catch (error) {
     return handleApiError(error);
   }
@@ -67,11 +75,16 @@ export async function DELETE(
     const resolvedParams = await params;
     const fileId = resolvedParams.id;
 
+    // Validate UUID param
+    if (!uuidSchema.safeParse(fileId).success) {
+      throw new ApiError('Invalid file ID', 'VALIDATION_ERROR', 400);
+    }
+
     const file = await prisma.file.findUnique({
-      where: { id: fileId },
+      where: { id: fileId, userId: dbUser.id },
     });
 
-    if (!file || file.userId !== dbUser.id) {
+    if (!file) {
       throw new ApiError('File not found or forbidden', 'NOT_FOUND', 404);
     }
 
@@ -90,7 +103,7 @@ export async function DELETE(
       metadata: { filename: file.filename },
     });
 
-    return NextResponse.json(deletedFile);
+    return NextResponse.json(sanitizeFile(deletedFile as unknown as Record<string, unknown>));
   } catch (error) {
     return handleApiError(error);
   }

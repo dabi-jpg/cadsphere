@@ -4,6 +4,7 @@ import { handleApiError, ApiError } from '@/lib/api-error';
 import { prisma } from '@/lib/prisma';
 import { deleteFromStorage } from '@/lib/storage';
 import { logActivity } from '@/lib/activity';
+import { uuidSchema } from '@/lib/validation';
 
 export async function DELETE(
   request: Request,
@@ -14,12 +15,16 @@ export async function DELETE(
     const resolvedParams = await params;
     const fileId = resolvedParams.id;
 
+    if (!uuidSchema.safeParse(fileId).success) {
+      throw new ApiError('Invalid file ID', 'VALIDATION_ERROR', 400);
+    }
+
     const file = await prisma.file.findUnique({
-      where: { id: fileId },
+      where: { id: fileId, userId: dbUser.id },
       include: { versions: true },
     });
 
-    if (!file || file.userId !== dbUser.id) {
+    if (!file) {
       throw new ApiError('File not found', 'NOT_FOUND', 404);
     }
 

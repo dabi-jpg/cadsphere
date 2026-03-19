@@ -4,6 +4,8 @@ import { handleApiError, ApiError } from '@/lib/api-error';
 import { prisma } from '@/lib/prisma';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { logActivity } from '@/lib/activity';
+import { uuidSchema } from '@/lib/validation';
+import { sanitizeFile } from '@/lib/sanitize';
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
@@ -15,6 +17,10 @@ export async function GET(
     const { dbUser } = await requireAuth();
     const resolvedParams = await params;
     const fileId = resolvedParams.id;
+
+    if (!uuidSchema.safeParse(fileId).success) {
+      throw new ApiError('Invalid file ID', 'VALIDATION_ERROR', 400);
+    }
 
     const file = await prisma.file.findUnique({
       where: { id: fileId },
@@ -29,6 +35,14 @@ export async function GET(
 
     const versions = await prisma.fileVersion.findMany({
       where: { fileId },
+      select: {
+        id: true,
+        fileId: true,
+        versionNumber: true,
+        size: true,
+        note: true,
+        createdAt: true,
+      },
       orderBy: { versionNumber: 'desc' },
     });
 
@@ -47,12 +61,16 @@ export async function POST(
     const resolvedParams = await params;
     const fileId = resolvedParams.id;
 
+    if (!uuidSchema.safeParse(fileId).success) {
+      throw new ApiError('Invalid file ID', 'VALIDATION_ERROR', 400);
+    }
+
     const fileCheck = await prisma.file.findUnique({
-      where: { id: fileId },
+      where: { id: fileId, userId: dbUser.id },
     });
 
     // Only owner can upload a new version
-    if (!fileCheck || fileCheck.userId !== dbUser.id) {
+    if (!fileCheck) {
       throw new ApiError('File not found or forbidden', 'NOT_FOUND', 404);
     }
 
@@ -125,7 +143,8 @@ export async function POST(
       metadata: { versionNumber: nextVersionNumber, note },
     });
 
-    return NextResponse.json(newVersion, { status: 201 });
+    // Return version without storagePath
+    return NextResponse.json(sanitizeFile(newVersion as unknown as Record<string, unknown>), { status: 201 });
   } catch (error) {
     return handleApiError(error);
   }

@@ -7,17 +7,21 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { loginSchema } from "@/lib/validation";
-import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from "@/lib/rate-limit";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
   try {
-    // Rate limiting: prevent brute-force login attempts
-    const rateLimitKey = getRateLimitKey(req, "auth-login");
-    const { allowed, remaining } = checkRateLimit(rateLimitKey, RATE_LIMITS.auth);
-    if (!allowed) {
-      return NextResponse.json(
-        { success: false, error: "Too many requests. Please try again later." },
-        { status: 429, headers: { "X-RateLimit-Remaining": String(remaining) } }
+    // Rate limiting: 5 attempts per 15 minutes per IP
+    const ip = getClientIp(req);
+    const limit = rateLimit({
+      key: `login:${ip}`,
+      limit: 5,
+      windowMs: 15 * 60 * 1000,
+    });
+    if (!limit.success) {
+      return Response.json(
+        { error: 'Too many requests. Please try again later.', code: 'RATE_LIMITED' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil((limit.resetAt - Date.now()) / 1000)) } }
       );
     }
 
@@ -25,7 +29,7 @@ export async function POST(req: Request) {
     const body = await req.json().catch(() => null);
     if (!body) {
       return NextResponse.json(
-        { success: false, error: "Invalid JSON body" },
+        { success: false, error: "Invalid JSON body", code: "INVALID_BODY" },
         { status: 400 }
       );
     }
@@ -34,7 +38,7 @@ export async function POST(req: Request) {
     if (!parsed.success) {
       const firstError = parsed.error.issues[0]?.message || "Validation failed";
       return NextResponse.json(
-        { success: false, error: firstError },
+        { success: false, error: firstError, code: "VALIDATION_ERROR" },
         { status: 400 }
       );
     }
@@ -69,7 +73,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(
-      { success: false, error: "Internal server error" },
+      { success: false, error: "Internal server error", code: "INTERNAL_ERROR" },
       { status: 500 }
     );
   }

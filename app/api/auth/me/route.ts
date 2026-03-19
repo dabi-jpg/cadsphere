@@ -1,8 +1,9 @@
 /**
- * GET /api/auth/me
+ * GET /api/auth/me — Returns the currently authenticated user's profile.
+ * PATCH /api/auth/me — Update user profile.
+ * DELETE /api/auth/me — Delete user account.
  * 
- * Returns the currently authenticated user's profile.
- * SECURITY: Uses Supabase session from cookies. No token parsing needed.
+ * SECURITY: Uses requireAuth(). Sanitized error responses. Never returns sensitive fields.
  */
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
@@ -12,10 +13,21 @@ import { z } from "zod";
 
 export async function GET() {
   try {
-    const { supabaseUser, dbUser } = await requireAuth();
+    const { dbUser } = await requireAuth();
+
+    // Return only safe fields — no supabaseId or sensitive data
     return NextResponse.json({
       success: true,
-      data: { user: dbUser },
+      data: {
+        user: {
+          id: dbUser.id,
+          email: dbUser.email,
+          name: dbUser.name,
+          avatarUrl: dbUser.avatarUrl,
+          createdAt: dbUser.createdAt,
+          updatedAt: dbUser.updatedAt,
+        }
+      },
     });
   } catch (error) {
     return handleApiError(error);
@@ -23,25 +35,40 @@ export async function GET() {
 }
 
 const updateProfileSchema = z.object({
-  name: z.string().min(1).optional(),
-  organization: z.string().optional(),
-  role: z.string().optional(),
+  name: z.string().min(1).max(100).trim().optional(),
+  organization: z.string().max(100).trim().optional(),
+  role: z.string().max(100).trim().optional(),
 });
 
 export async function PATCH(request: Request) {
   try {
     const { dbUser } = await requireAuth();
-    const body = await request.json();
+
+    const body = await request.json().catch(() => null);
+    if (!body) {
+      return NextResponse.json({ error: 'Invalid JSON', code: 'INVALID_BODY' }, { status: 400 });
+    }
+
     const result = updateProfileSchema.safeParse(body);
-    
     if (!result.success) {
-      return NextResponse.json({ success: false, error: "Invalid data" }, { status: 400 });
+      return NextResponse.json(
+        { error: result.error.issues[0]?.message || 'Validation error', code: 'VALIDATION_ERROR' },
+        { status: 400 }
+      );
     }
 
     const { name, organization, role } = result.data;
     const updatedUser = await prisma.user.update({
       where: { id: dbUser.id },
-      data: { name, organization, role } as any,
+      data: { name, organization, role } as Record<string, unknown>,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        avatarUrl: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
 
     return NextResponse.json({ success: true, data: { user: updatedUser } });
@@ -52,14 +79,8 @@ export async function PATCH(request: Request) {
 
 export async function DELETE() {
   try {
-    const { dbUser, supabaseUser } = await requireAuth();
-    // In a real scenario, you probably want to delete or transfer files first,
-    // and delete the user from Supabase Auth as well via Admin API.
-    // For now, we will soft-delete or delete from Prisma.
-    // However, Supabase Auth user deletion requires Service Role Key.
-    
+    const { dbUser } = await requireAuth();
     await prisma.user.delete({ where: { id: dbUser.id } });
-    
     return NextResponse.json({ success: true, message: "Account deleted" });
   } catch (error) {
     return handleApiError(error);

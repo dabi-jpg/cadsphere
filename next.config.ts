@@ -15,6 +15,12 @@ const nextConfig: NextConfig = {
    */
   turbopack: {},
 
+  /** SECURITY: Don't expose Next.js version in X-Powered-By header */
+  poweredByHeader: false,
+
+  /** Enable gzip compression */
+  compress: true,
+
   /**
    * SECURITY: OWASP-recommended HTTP response headers.
    * These protect against clickjacking, MIME-sniffing, and information leakage.
@@ -37,9 +43,15 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        source: "/api/:path*",
+        headers: [
+          { key: "Cache-Control", value: "no-store, no-cache, must-revalidate" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+        ],
+      },
     ];
   },
 };
 
 export default nextConfig;
-

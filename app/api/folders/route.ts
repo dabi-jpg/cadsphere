@@ -4,17 +4,18 @@ import { requireAuth } from '@/lib/auth';
 import { handleApiError, ApiError } from '@/lib/api-error';
 import { prisma } from '@/lib/prisma';
 import { logActivity } from '@/lib/activity';
-
-const folderSchema = z.object({
-  name: z.string().min(1, 'Folder name is required'),
-  parentId: z.string().nullable().optional(),
-});
+import { createFolderSchema, uuidSchema } from '@/lib/validation';
 
 export async function GET(request: Request) {
   try {
     const { dbUser } = await requireAuth();
     const { searchParams } = new URL(request.url);
     const parentId = searchParams.get('parentId');
+
+    // Validate parentId if provided (and not 'root')
+    if (parentId && parentId !== 'root' && !uuidSchema.safeParse(parentId).success) {
+      throw new ApiError('Invalid parent ID', 'VALIDATION_ERROR', 400);
+    }
 
     const folders = await prisma.folder.findMany({
       where: {
@@ -36,8 +37,17 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const { dbUser } = await requireAuth();
-    const body = await request.json();
-    const { name, parentId } = folderSchema.parse(body);
+
+    const body = await request.json().catch(() => null);
+    if (!body) {
+      throw new ApiError('Invalid JSON', 'INVALID_BODY', 400);
+    }
+
+    const parsed = createFolderSchema.safeParse(body);
+    if (!parsed.success) {
+      throw new ApiError(parsed.error.issues[0]?.message || 'Validation error', 'VALIDATION_ERROR', 400);
+    }
+    const { name, parentId } = parsed.data;
 
     if (parentId) {
       const parent = await prisma.folder.findUnique({

@@ -2,9 +2,10 @@
  * Next.js Middleware
  * 
  * Runs on every request. Handles:
- * 1. Supabase session refresh (keeps auth cookies alive)
- * 2. Route protection (redirect unauthenticated users from /dashboard, /viewer)
- * 3. Rate limiting for API routes
+ * 1. Security headers on all responses (CSP, HSTS, XSS, etc.)
+ * 2. Supabase session refresh (keeps auth cookies alive)
+ * 3. Route protection (redirect unauthenticated users from /dashboard, /viewer)
+ * 4. Rate limiting for API routes
  * 
  * SECURITY: Session cookies are refreshed on every request to prevent
  * stale sessions. Protected routes redirect to /login if no session exists.
@@ -20,6 +21,27 @@ const PROTECTED_ROUTES = ["/dashboard", "/viewer"];
 const API_RATE_LIMIT_MAP: Record<string, { readonly maxRequests: number; readonly windowMs: number }> = {
   "/api/auth/": RATE_LIMITS.auth,
   "/api/files/upload": RATE_LIMITS.upload,
+};
+
+/** OWASP-recommended security headers */
+const securityHeaders: Record<string, string> = {
+  'X-DNS-Prefetch-Control': 'on',
+  'X-Frame-Options': 'DENY',
+  'X-Content-Type-Options': 'nosniff',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+  'X-XSS-Protection': '1; mode=block',
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+  'Content-Security-Policy': [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com",
+    "img-src 'self' data: blob: https://*.supabase.co https://lh3.googleusercontent.com",
+    "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
+    "worker-src 'self' blob:",
+    "frame-ancestors 'none'",
+  ].join('; '),
 };
 
 export async function middleware(request: NextRequest) {
@@ -94,6 +116,11 @@ export async function middleware(request: NextRequest) {
     loginUrl.pathname = "/login";
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
+  }
+
+  // ─── Apply Security Headers ───────────────────────────────────────
+  for (const [key, value] of Object.entries(securityHeaders)) {
+    supabaseResponse.headers.set(key, value);
   }
 
   return supabaseResponse;

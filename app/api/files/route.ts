@@ -4,6 +4,7 @@ import { requireAuth } from '@/lib/auth';
 import { handleApiError } from '@/lib/api-error';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
+import { sanitizeFile } from '@/lib/sanitize';
 
 export async function GET(request: Request) {
   try {
@@ -37,7 +38,16 @@ export async function GET(request: Request) {
     const [files, summary] = await Promise.all([
       prisma.file.findMany({
         where,
-        include: {
+        select: {
+          id: true,
+          filename: true,
+          filetype: true,
+          size: true,
+          createdAt: true,
+          updatedAt: true,
+          folderId: true,
+          tags: true,
+          deletedAt: true,
           folder: { select: { id: true, name: true } },
           _count: { select: { versions: true } },
           starredBy: {

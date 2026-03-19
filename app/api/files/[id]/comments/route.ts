@@ -4,10 +4,8 @@ import { requireAuth } from '@/lib/auth';
 import { handleApiError, ApiError } from '@/lib/api-error';
 import { prisma } from '@/lib/prisma';
 import { logActivity } from '@/lib/activity';
-
-const commentSchema = z.object({
-  body: z.string().min(1, 'Comment cannot be empty'),
-});
+import { uuidSchema, createCommentSchema } from '@/lib/validation';
+import { rateLimit } from '@/lib/rate-limit';
 
 export async function GET(
   request: Request,
@@ -17,6 +15,10 @@ export async function GET(
     const { dbUser } = await requireAuth();
     const resolvedParams = await params;
     const fileId = resolvedParams.id;
+
+    if (!uuidSchema.safeParse(fileId).success) {
+      throw new ApiError('Invalid file ID', 'VALIDATION_ERROR', 400);
+    }
 
     // Permissions check
     const file = await prisma.file.findUnique({
@@ -52,9 +54,34 @@ export async function POST(
     const { dbUser } = await requireAuth();
     const resolvedParams = await params;
     const fileId = resolvedParams.id;
-    const body = await request.json();
-    
-    const { body: commentBody } = commentSchema.parse(body);
+
+    if (!uuidSchema.safeParse(fileId).success) {
+      throw new ApiError('Invalid file ID', 'VALIDATION_ERROR', 400);
+    }
+
+    // Rate limit: 30 comments per hour per user
+    const limit = rateLimit({
+      key: `comments:${dbUser.id}`,
+      limit: 30,
+      windowMs: 60 * 60 * 1000,
+    });
+    if (!limit.success) {
+      return Response.json(
+        { error: 'Too many requests. Please try again later.', code: 'RATE_LIMITED' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil((limit.resetAt - Date.now()) / 1000)) } }
+      );
+    }
+
+    const body = await request.json().catch(() => null);
+    if (!body) {
+      throw new ApiError('Invalid JSON', 'INVALID_BODY', 400);
+    }
+
+    const parsed = createCommentSchema.safeParse(body);
+    if (!parsed.success) {
+      throw new ApiError(parsed.error.issues[0]?.message || 'Validation error', 'VALIDATION_ERROR', 400);
+    }
+    const { body: commentBody } = parsed.data;
 
     // Permissions check
     const file = await prisma.file.findUnique({

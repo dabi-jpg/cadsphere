@@ -8,17 +8,21 @@ import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { prisma } from "@/lib/prisma";
 import { registerSchema } from "@/lib/validation";
-import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from "@/lib/rate-limit";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
   try {
-    // Rate limiting: prevent brute-force registration attempts
-    const rateLimitKey = getRateLimitKey(req, "auth-register");
-    const { allowed, remaining } = checkRateLimit(rateLimitKey, RATE_LIMITS.auth);
-    if (!allowed) {
-      return NextResponse.json(
-        { success: false, error: "Too many requests. Please try again later." },
-        { status: 429, headers: { "X-RateLimit-Remaining": String(remaining) } }
+    // Rate limiting: 3 attempts per hour per IP
+    const ip = getClientIp(req);
+    const limit = rateLimit({
+      key: `register:${ip}`,
+      limit: 3,
+      windowMs: 60 * 60 * 1000,
+    });
+    if (!limit.success) {
+      return Response.json(
+        { error: 'Too many requests. Please try again later.', code: 'RATE_LIMITED' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil((limit.resetAt - Date.now()) / 1000)) } }
       );
     }
 
@@ -26,7 +30,7 @@ export async function POST(req: Request) {
     const body = await req.json().catch(() => null);
     if (!body) {
       return NextResponse.json(
-        { success: false, error: "Invalid JSON body" },
+        { success: false, error: "Invalid JSON body", code: "INVALID_BODY" },
         { status: 400 }
       );
     }
@@ -35,7 +39,7 @@ export async function POST(req: Request) {
     if (!parsed.success) {
       const firstError = parsed.error.issues[0]?.message || "Validation failed";
       return NextResponse.json(
-        { success: false, error: firstError },
+        { success: false, error: firstError, code: "VALIDATION_ERROR" },
         { status: 400 }
       );
     }
@@ -62,8 +66,6 @@ export async function POST(req: Request) {
     }
 
     // Sync user into our database so file foreign key references work.
-    // Uses upsert by supabaseId to match the same key used by requireAuth(),
-    // preventing duplicate user records.
     if (data.user) {
       try {
         await prisma.user.upsert({
@@ -80,7 +82,6 @@ export async function POST(req: Request) {
           },
         });
       } catch (dbError) {
-        // Log error but don't fail the registration; Supabase Auth succeeded.
         console.error("User database sync failed:", dbError);
       }
     }
@@ -101,7 +102,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error("Registration error:", error);
     return NextResponse.json(
-      { success: false, error: "Internal server error" },
+      { success: false, error: "Internal server error", code: "INTERNAL_ERROR" },
       { status: 500 }
     );
   }

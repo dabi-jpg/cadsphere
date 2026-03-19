@@ -3,6 +3,7 @@ import { requireAuth } from '@/lib/auth';
 import { handleApiError, ApiError } from '@/lib/api-error';
 import { prisma } from '@/lib/prisma';
 import { logActivity } from '@/lib/activity';
+import { uuidSchema } from '@/lib/validation';
 
 export async function POST(
   request: Request,
@@ -12,6 +13,10 @@ export async function POST(
     const { dbUser } = await requireAuth();
     const resolvedParams = await params;
     const fileId = resolvedParams.fileId;
+
+    if (!uuidSchema.safeParse(fileId).success) {
+      throw new ApiError('Invalid file ID', 'VALIDATION_ERROR', 400);
+    }
 
     const file = await prisma.file.findUnique({
       where: { id: fileId },
@@ -46,6 +51,10 @@ export async function DELETE(
     const { dbUser } = await requireAuth();
     const resolvedParams = await params;
     const fileId = resolvedParams.fileId;
+
+    if (!uuidSchema.safeParse(fileId).success) {
+      throw new ApiError('Invalid file ID', 'VALIDATION_ERROR', 400);
+    }
 
     await prisma.starredFile.deleteMany({
       where: {

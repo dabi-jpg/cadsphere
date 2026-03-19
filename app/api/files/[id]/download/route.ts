@@ -3,6 +3,7 @@ import { requireAuth } from "@/lib/auth";
 import { handleApiError, ApiError } from "@/lib/api-error";
 import { prisma } from "@/lib/prisma";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { uuidSchema } from "@/lib/validation";
 
 export async function GET(
   _request: Request,
@@ -12,15 +13,18 @@ export async function GET(
     const { dbUser } = await requireAuth();
     const { id } = await params;
 
+    // Validate UUID param
+    if (!uuidSchema.safeParse(id).success) {
+      throw new ApiError('Invalid file ID', 'VALIDATION_ERROR', 400);
+    }
+
     // Find file and verify ownership
-    const file = await prisma.file.findUnique({ where: { id } });
+    const file = await prisma.file.findUnique({
+      where: { id, userId: dbUser.id },
+    });
 
     if (!file) {
       throw new ApiError("File not found", "NOT_FOUND", 404);
-    }
-
-    if (file.userId !== dbUser.id) {
-      throw new ApiError("Forbidden", "FORBIDDEN", 403);
     }
 
     // Fetch the file from Supabase Storage using admin client

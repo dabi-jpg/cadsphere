@@ -5,6 +5,7 @@ import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { handleApiError, ApiError } from "@/lib/api-error";
 import { logAudit } from "@/lib/audit";
+import { uuidSchema } from "@/lib/validation";
 
 export async function POST(
   _request: Request,
@@ -14,12 +15,14 @@ export async function POST(
     const { dbUser } = await requireAuth();
     const { id, versionId } = await params;
 
-    const file = await prisma.file.findUnique({ where: { id } });
+    // Validate UUID params
+    if (!uuidSchema.safeParse(id).success || !uuidSchema.safeParse(versionId).success) {
+      throw new ApiError('Invalid ID format', 'VALIDATION_ERROR', 400);
+    }
+
+    const file = await prisma.file.findUnique({ where: { id, userId: dbUser.id } });
     if (!file) {
       throw new ApiError("File not found", "NOT_FOUND", 404);
-    }
-    if (file.userId !== dbUser.id) {
-      throw new ApiError("Forbidden", "FORBIDDEN", 403);
     }
 
     const versions = await prisma.$queryRawUnsafe<Array<{
