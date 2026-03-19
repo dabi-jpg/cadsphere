@@ -1,0 +1,12 @@
+﻿app/api/audit/route.ts(6,10): error TS2305: Module '"@/lib/api-error"' has no exported member 'Errors'.
+app/api/audit/route.ts(6,18): error TS2305: Module '"@/lib/api-error"' has no exported member 'successResponse'.
+app/api/files/[id]/share/route.ts(6,10): error TS2305: Module '"@/lib/api-error"' has no exported member 'Errors'.
+app/api/files/[id]/share/route.ts(6,18): error TS2305: Module '"@/lib/api-error"' has no exported member 'successResponse'.
+app/api/files/[id]/versions/[versionId]/restore/route.ts(6,10): error TS2305: Module '"@/lib/api-error"' has no exported member 'Errors'.
+app/api/files/[id]/versions/[versionId]/restore/route.ts(6,18): error TS2305: Module '"@/lib/api-error"' has no exported member 'successResponse'.
+app/api/files/bulk-delete/route.ts(6,10): error TS2305: Module '"@/lib/api-error"' has no exported member 'Errors'.
+app/api/files/bulk-delete/route.ts(6,18): error TS2305: Module '"@/lib/api-error"' has no exported member 'successResponse'.
+app/api/share/[token]/route.ts(7,10): error TS2305: Module '"@/lib/api-error"' has no exported member 'Errors'.
+app/api/share/[token]/route.ts(7,18): error TS2305: Module '"@/lib/api-error"' has no exported member 'successResponse'.
+lib/activity.ts(22,9): error TS2322: Type 'Record<string, unknown>' is not assignable to type 'NullableJsonNullValueInput | InputJsonValue | undefined'.
+  Type 'Record<string, unknown>' is missing the following properties from type 'readonly (InputJsonValue | null)[]': length, concat, join, slice, and 26 more.

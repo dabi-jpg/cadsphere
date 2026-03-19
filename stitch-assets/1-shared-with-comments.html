@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2b6cee",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<title>CAD Storage - Shared with Me</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col shrink-0">
+<div class="p-6">
+<div class="flex items-center gap-3 mb-8">
+<div class="bg-primary/10 p-2 rounded-lg text-primary">
+<span class="material-symbols-outlined">database</span>
+</div>
+<div>
+<h1 class="text-slate-900 dark:text-slate-100 text-base font-bold leading-tight">CAD Storage</h1>
+<p class="text-slate-500 text-xs">Enterprise Server</p>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">folder</span>
+<span class="text-sm font-medium">My Files</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">schedule</span>
+<span class="text-sm font-medium">Recent</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-sm font-medium">Shared</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">star</span>
+<span class="text-sm font-medium">Starred</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">delete</span>
+<span class="text-sm font-medium">Trash</span>
+</a>
+</nav>
+</div>
+<div class="mt-auto p-6 border-t border-slate-200 dark:border-slate-800">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+<div class="mt-4 flex items-center gap-3 px-3 py-2">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold" data-alt="User profile avatar circle" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCnhfkF7Ji6TIc7291lzkApEv4Im3uNHWA9fyT0QvMpu0VK8WSxilAHljbLa44hCy6EzkAEeiDNsMeF_5g55m0T8OK15RyTD4XAZMBgwO7bHuIUXscWGN7Jn6hveQvI_nRr_IQSvU4lRzuhHstp8iYx-67JIp5EB1rryOWYBZzOCTsv0L0EurQcKsbjCjJgcRHC5-tT7F6QZM-TwS5htf4XfYfZorvzciCntMfDDFIwlHtUZr2E6gSCQrLW8_N-9r-iBnUqIvyI9hM"); background-size: cover;'></div>
+<div class="flex flex-col">
+<span class="text-sm font-medium">Alex Rivera</span>
+<span class="text-xs text-slate-500">Pro Account</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0 bg-white dark:bg-slate-900 overflow-hidden">
+<!-- Header -->
+<header class="flex items-center justify-between px-8 py-4 border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-4 flex-1">
+<h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 whitespace-nowrap">Shared with Me</h2>
+<div class="relative w-full max-w-md ml-4">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">search</span>
+<input class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg pl-11 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary/50 text-slate-900 dark:text-slate-100" placeholder="Search shared CAD files, projects..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<button class="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-primary/90 transition-colors ml-2">
+<span class="material-symbols-outlined text-lg">add</span>
+                    New Folder
+                </button>
+</div>
+</header>
+<!-- Breadcrumbs & Tabs -->
+<div class="px-8 pt-4 pb-0 bg-white dark:bg-slate-900">
+<div class="flex items-center gap-2 text-sm text-slate-500 mb-4">
+<a class="hover:text-primary transition-colors" href="#">Home</a>
+<span class="material-symbols-outlined text-base">chevron_right</span>
+<span class="text-slate-900 dark:text-slate-100 font-medium">Shared with Me</span>
+</div>
+<div class="flex border-b border-slate-200 dark:border-slate-800 gap-8">
+<button class="px-1 py-3 border-b-2 border-primary text-primary text-sm font-semibold">
+                    All Shared
+                </button>
+<button class="px-1 py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-700 text-sm font-semibold">
+                    Recents
+                </button>
+<button class="px-1 py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-700 text-sm font-semibold">
+                    By Team
+                </button>
+</div>
+</div>
+<!-- Filter Bar -->
+<div class="px-8 py-3 flex gap-3 overflow-x-auto no-scrollbar">
+<button class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300">
+<span>File Type</span>
+<span class="material-symbols-outlined text-base">keyboard_arrow_down</span>
+</button>
+<button class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300">
+<span>Owner</span>
+<span class="material-symbols-outlined text-base">keyboard_arrow_down</span>
+</button>
+<button class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300">
+<span>Date Shared</span>
+<span class="material-symbols-outlined text-base">keyboard_arrow_down</span>
+</button>
+<button class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300">
+<span>Permissions</span>
+<span class="material-symbols-outlined text-base">keyboard_arrow_down</span>
+</button>
+</div>
+<!-- Content Table -->
+<div class="flex-1 overflow-y-auto px-8 pb-8">
+<div class="w-full">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
+<th class="py-4 font-semibold w-1/3">Name</th>
+<th class="py-4 font-semibold">Shared By</th>
+<th class="py-4 font-semibold">Date Shared</th>
+<th class="py-4 font-semibold">Permission</th>
+<th class="py-4 font-semibold text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="text-sm">
+<!-- File 1: RVT -->
+<tr class="group border-b border-slate-50 dark:border-slate-800/50 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer bg-slate-50 dark:bg-slate-800/20">
+<td class="py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600">
+<span class="material-symbols-outlined">architecture</span>
+</div>
+<div>
+<div class="font-semibold text-slate-900 dark:text-slate-100">Main_Terminal_v4.rvt</div>
+<div class="text-xs text-slate-500">142.5 MB</div>
+</div>
+</div>
+</td>
+<td class="py-4">
+<div class="flex items-center gap-2">
+<img alt="" class="w-6 h-6 rounded-full" data-alt="Avatar of Sarah Miller" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBp7xIeOO175aJTyi5kem35ObnE7-9k4oAUc2G_59oAPYU04M_Dpbnc3m8t_CSZ_A-8ZRcD9eJWI2_GXpo017GzlAY_EFSNxJqav2zk7YcQIAs-_mh53H80gEYQ75IyvesYf2L5HAiquF4K560GNwU9s5isG-WAkNAOPxEVZcrarLnPHG-jvRY8NVlatpVoi7rh29zxqTDLMzO7gRSFzrHxReOHL7EsaAmQb705v7kP3ypGKw_1g3O5a4lg3WZ6WEx5wwTrnz66a_g"/>
+<span class="text-slate-700 dark:text-slate-300">Sarah Miller</span>
+</div>
+</td>
+<td class="py-4 text-slate-600 dark:text-slate-400">Oct 12, 2023</td>
+<td class="py-4">
+<span class="px-2 py-1 bg-primary/10 text-primary text-xs font-semibold rounded">Editor</span>
+</td>
+<td class="py-4 text-right">
+<button class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded">
+<span class="material-symbols-outlined text-slate-400">more_horiz</span>
+</button>
+</td>
+</tr>
+<!-- File 2: DWG -->
+<tr class="group border-b border-slate-50 dark:border-slate-800/50 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer">
+<td class="py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600">
+<span class="material-symbols-outlined">view_in_ar</span>
+</div>
+<div>
+<div class="font-semibold text-slate-900 dark:text-slate-100">HVAC_Layout_Ground.dwg</div>
+<div class="text-xs text-slate-500">12.8 MB</div>
+</div>
+</div>
+</td>
+<td class="py-4">
+<div class="flex items-center gap-2">
+<img alt="" class="w-6 h-6 rounded-full" data-alt="Avatar of David Chen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGHT8oCrWsRvAzrmFf_lwusY1E5nqZaPPTFrKXJUpnoH5GoiPeBd3_FibzTRZOrmuiK2mJq-2cxjcmZ_aQGDSaBCdedGfUIX59GCE--fK8KnNFZzxUZ4h5E9io0yrCNaFMrzXCg_Z1QVBnSBdLF6SlcTe5qqmlbByBlnNYI6LkcHleisj1ibwkj8iiSfjWdlcaKfeoDuM--cftjRZCuhPDhAyII8Rz0HaJthtQ4qz62muYTk3Kz-o0yxz4YZgnV2n2Gmr7EiXWbbk"/>
+<span class="text-slate-700 dark:text-slate-300">David Chen</span>
+</div>
+</td>
+<td class="py-4 text-slate-600 dark:text-slate-400">Oct 10, 2023</td>
+<td class="py-4">
+<span class="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-semibold rounded">Viewer</span>
+</td>
+<td class="py-4 text-right">
+<button class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded">
+<span class="material-symbols-outlined text-slate-400">more_horiz</span>
+</button>
+</td>
+</tr>
+<!-- File 3: STEP -->
+<tr class="group border-b border-slate-50 dark:border-slate-800/50 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer">
+<td class="py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600">
+<span class="material-symbols-outlined">precision_manufacturing</span>
+</div>
+<div>
+<div class="font-semibold text-slate-900 dark:text-slate-100">Engine_Block_Assembly.step</div>
+<div class="text-xs text-slate-500">88.4 MB</div>
+</div>
+</div>
+</td>
+<td class="py-4">
+<div class="flex items-center gap-2">
+<img alt="" class="w-6 h-6 rounded-full" data-alt="Avatar of Jordan Smith" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbGWMLOFYV6cnUdfamenuoCNN3jwDrzU4w31SHL9v87c5lsbqE3JFdvxDa1MblG25NW70PL5_sBvfW1fzhc1KyX0sJrbweSn8xH2jVom5NDDUd7lG3ws5XPubX-WG6gxmtmvX_-mEdBX9ZWeW1la1pim5hITUY2lajdVlEr_6vAgSHEoGCUSS2czi__gE2FMjGmRKhy3UopOfKOCvjxo6b2tij5Z3AOS1dsh8KYjTKKij02-GWOmnifD3j4RalKAXRLB1MbWgCs1w"/>
+<span class="text-slate-700 dark:text-slate-300">Jordan Smith</span>
+</div>
+</td>
+<td class="py-4 text-slate-600 dark:text-slate-400">Oct 08, 2023</td>
+<td class="py-4">
+<span class="px-2 py-1 bg-primary/10 text-primary text-xs font-semibold rounded">Editor</span>
+</td>
+<td class="py-4 text-right">
+<button class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded">
+<span class="material-symbols-outlined text-slate-400">more_horiz</span>
+</button>
+</td>
+</tr>
+<!-- File 4: DXF -->
+<tr class="group border-b border-slate-50 dark:border-slate-800/50 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer">
+<td class="py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600">
+<span class="material-symbols-outlined">straighten</span>
+</div>
+<div>
+<div class="font-semibold text-slate-900 dark:text-slate-100">Floor_Plan_Redline.dxf</div>
+<div class="text-xs text-slate-500">4.2 MB</div>
+</div>
+</div>
+</td>
+<td class="py-4">
+<div class="flex items-center gap-2">
+<img alt="" class="w-6 h-6 rounded-full" data-alt="Avatar of Maria Garcia" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfZgLVF-iQ4ZuBQPMqUmrDVDlfdjMjB81fLONorInbBvhsPx3Jivh7JqVUsCplnkhlXDp1PaYWM3yAlada8LNOA0U6qKdIPXUuoQ9sbm8yUTkUERXE0VGd05twT98qYVen2EpnZdAzvnN2cSuNYTdwl91h7YsJjXNhcqWJxCAWPmCKecQJoktAyNPkV6-KkmPQSbk8XFAfHYQuL8IoclRzcPkQ-FyNL0TrxSCSzk4sVU4NRuA713RJDtLC5ln3wix8fP5PEH1ux20"/>
+<span class="text-slate-700 dark:text-slate-300">Maria Garcia</span>
+</div>
+</td>
+<td class="py-4 text-slate-600 dark:text-slate-400">Oct 05, 2023</td>
+<td class="py-4">
+<span class="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-semibold rounded">Viewer</span>
+</td>
+<td class="py-4 text-right">
+<button class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded">
+<span class="material-symbols-outlined text-slate-400">more_horiz</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</main>
+<!-- Comments Sidebar -->
+<aside class="w-96 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 flex flex-col shrink-0">
+<div class="p-6 border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center justify-between mb-2">
+<h3 class="font-bold text-slate-900 dark:text-slate-100">Comments</h3>
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 shrink-0">
+<span class="material-symbols-outlined text-lg">architecture</span>
+</div>
+<div class="min-w-0">
+<p class="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">Main_Terminal_v4.rvt</p>
+<p class="text-[10px] text-slate-500">Shared by Sarah Miller</p>
+</div>
+</div>
+</div>
+<!-- Comments List -->
+<div class="flex-1 overflow-y-auto p-6 space-y-6">
+<div class="flex gap-3">
+<img alt="" class="w-8 h-8 rounded-full shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBp7xIeOO175aJTyi5kem35ObnE7-9k4oAUc2G_59oAPYU04M_Dpbnc3m8t_CSZ_A-8ZRcD9eJWI2_GXpo017GzlAY_EFSNxJqav2zk7YcQIAs-_mh53H80gEYQ75IyvesYf2L5HAiquF4K560GNwU9s5isG-WAkNAOPxEVZcrarLnPHG-jvRY8NVlatpVoi7rh29zxqTDLMzO7gRSFzrHxReOHL7EsaAmQb705v7kP3ypGKw_1g3O5a4lg3WZ6WEx5wwTrnz66a_g"/>
+<div class="flex-1">
+<div class="flex items-center justify-between mb-1">
+<span class="text-sm font-semibold text-slate-900 dark:text-white">Sarah Miller</span>
+<span class="text-[10px] text-slate-400">2h ago</span>
+</div>
+<div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-lg rounded-tl-none">
+<p class="text-sm text-slate-700 dark:text-slate-300">I've updated the structural columns in Section B. Please review the load calculations for the new placement.</p>
+</div>
+</div>
+</div>
+<div class="flex gap-3">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-[10px] font-bold shrink-0" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCnhfkF7Ji6TIc7291lzkApEv4Im3uNHWA9fyT0QvMpu0VK8WSxilAHljbLa44hCy6EzkAEeiDNsMeF_5g55m0T8OK15RyTD4XAZMBgwO7bHuIUXscWGN7Jn6hveQvI_nRr_IQSvU4lRzuhHstp8iYx-67JIp5EB1rryOWYBZzOCTsv0L0EurQcKsbjCjJgcRHC5-tT7F6QZM-TwS5htf4XfYfZorvzciCntMfDDFIwlHtUZr2E6gSCQrLW8_N-9r-iBnUqIvyI9hM"); background-size: cover;'></div>
+<div class="flex-1">
+<div class="flex items-center justify-between mb-1">
+<span class="text-sm font-semibold text-slate-900 dark:text-white">Alex Rivera</span>
+<span class="text-[10px] text-slate-400">1h ago</span>
+</div>
+<div class="bg-primary/5 border border-primary/10 p-3 rounded-lg rounded-tl-none">
+<p class="text-sm text-slate-700 dark:text-slate-300">Looks much cleaner now. Will run the simulation this afternoon and get back to you with the results.</p>
+</div>
+<div class="flex gap-4 mt-2">
+<button class="text-[10px] font-bold text-slate-500 hover:text-primary uppercase">Reply</button>
+<button class="text-[10px] font-bold text-slate-500 hover:text-primary uppercase">Edit</button>
+</div>
+</div>
+</div>
+<div class="flex gap-3">
+<img alt="" class="w-8 h-8 rounded-full shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGHT8oCrWsRvAzrmFf_lwusY1E5nqZaPPTFrKXJUpnoH5GoiPeBd3_FibzTRZOrmuiK2mJq-2cxjcmZ_aQGDSaBCdedGfUIX59GCE--fK8KnNFZzxUZ4h5E9io0yrCNaFMrzXCg_Z1QVBnSBdLF6SlcTe5qqmlbByBlnNYI6LkcHleisj1ibwkj8iiSfjWdlcaKfeoDuM--cftjRZCuhPDhAyII8Rz0HaJthtQ4qz62muYTk3Kz-o0yxz4YZgnV2n2Gmr7EiXWbbk"/>
+<div class="flex-1">
+<div class="flex items-center justify-between mb-1">
+<span class="text-sm font-semibold text-slate-900 dark:text-white">David Chen</span>
+<span class="text-[10px] text-slate-400">45m ago</span>
+</div>
+<div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-lg rounded-tl-none">
+<p class="text-sm text-slate-700 dark:text-slate-300">@Alex, don't forget to check the HVAC interference around column B-12 while you're at it.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Comment Input Area -->
+<div class="p-6 border-t border-slate-200 dark:border-slate-800">
+<div class="relative">
+<textarea class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary/50 text-slate-900 dark:text-slate-100 resize-none min-h-[100px]" placeholder="Add a comment..."></textarea>
+<div class="absolute bottom-3 right-3 flex items-center gap-2">
+<button class="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-symbols-outlined text-lg">mood</span>
+</button>
+<button class="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-symbols-outlined text-lg">attach_file</span>
+</button>
+<button class="bg-primary text-white p-1.5 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-lg">send</span>
+</button>
+</div>
+</div>
+<p class="mt-3 text-[10px] text-slate-500 flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">info</span>
+                Shift + Enter for new line
+            </p>
+</div>
+</aside>
+<!-- Activity Panel (Collapsed for desktop to make room for comments) -->
+<aside class="w-80 bg-slate-50 dark:bg-slate-800/50 border-l border-slate-200 dark:border-slate-800 p-6 hidden 2xl:flex flex-col">
+<h3 class="font-bold text-sm text-slate-900 dark:text-slate-100 mb-6 uppercase tracking-wider">Recent Activity</h3>
+<div class="flex flex-col gap-6">
+<div class="flex gap-3">
+<div class="w-2 h-2 rounded-full bg-blue-500 mt-1.5 shrink-0"></div>
+<div>
+<p class="text-sm text-slate-700 dark:text-slate-300"><span class="font-semibold text-slate-900 dark:text-white">Sarah Miller</span> updated Main_Terminal_v4.rvt</p>
+<p class="text-xs text-slate-500 mt-1">2 hours ago</p>
+</div>
+</div>
+<div class="flex gap-3">
+<div class="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 shrink-0"></div>
+<div>
+<p class="text-sm text-slate-700 dark:text-slate-300"><span class="font-semibold text-slate-900 dark:text-white">David Chen</span> granted you viewer access</p>
+<p class="text-xs text-slate-500 mt-1">5 hours ago</p>
+</div>
+</div>
+</div>
+<div class="mt-auto bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+<div class="flex items-center justify-between mb-3">
+<span class="text-xs font-bold text-slate-500">STORAGE</span>
+<span class="text-xs font-bold text-primary">85%</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[85%] rounded-full"></div>
+</div>
+<p class="text-[10px] text-slate-500 mt-3 text-center">42.5 GB of 50 GB used. Upgrade for more.</p>
+</div>
+</aside>
+</div>
+</body></html>

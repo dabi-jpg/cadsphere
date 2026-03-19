@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Internal CAD Storage - Corporate Engineering Portal</title>
+<!-- Tailwind CSS v3 with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#2b6cee',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          borderRadius: {
+            'custom': '8px',
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="global-typography">
+    body {
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+  </style>
+<style data-purpose="layout-utilities">
+    .section-padding {
+      padding-top: 5rem;
+      padding-bottom: 5rem;
+    }
+    .hover-transition {
+      transition: all 0.3s ease;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+<!-- BEGIN: MainHeader -->
+<header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+<nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between" data-purpose="navigation-bar">
+<!-- Company Branding -->
+<div class="flex items-center gap-2" data-purpose="brand-logo">
+<div class="w-8 h-8 bg-primary rounded-custom flex items-center justify-center text-white font-bold">C</div>
+<span class="font-bold text-xl tracking-tight">CorpCAD Vault</span>
+</div>
+<!-- Navigation Links -->
+<div class="hidden md:flex items-center space-x-8" data-purpose="internal-links">
+<a class="text-sm font-medium text-slate-600 hover:text-primary hover-transition" href="#features">Infrastructure</a>
+<a class="text-sm font-medium text-slate-600 hover:text-primary hover-transition" href="#news">Internal Updates</a>
+<a class="text-sm font-medium text-slate-600 hover:text-primary hover-transition" href="#">Support Docs</a>
+</div>
+<!-- Action Buttons -->
+<div class="flex items-center gap-4">
+<button class="text-sm font-semibold text-primary px-4 py-2 rounded-custom hover:bg-blue-50 hover-transition">
+          Internal Access
+        </button>
+<button class="bg-primary text-white text-sm font-semibold px-5 py-2 rounded-custom hover:bg-blue-700 hover-transition shadow-sm shadow-blue-200">
+          Employee Login
+        </button>
+</div>
+</nav>
+</header>
+<!-- END: MainHeader -->
+<main>
+<!-- BEGIN: HeroSection -->
+<section class="bg-white section-padding border-b border-slate-100" data-purpose="hero-banner">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex flex-col lg:flex-row items-center gap-12">
+<!-- Text Content -->
+<div class="flex-1 text-center lg:text-left">
+<div class="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-primary text-xs font-bold uppercase tracking-wider mb-6">
+              Internal Corporate Resource
+            </div>
+<h1 class="text-4xl lg:text-6xl font-extrabold text-slate-900 leading-tight mb-6">
+              Centralized Engineering <span class="text-primary text-opacity-90">Design Vault</span>
+</h1>
+<p class="text-lg text-slate-600 mb-8 max-w-2xl mx-auto lg:mx-0">
+              Access the company's secure private cloud for CAD storage, versioning, and cross-departmental collaboration. Unified infrastructure for global engineering teams.
+            </p>
+<div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+<button class="bg-primary text-white px-8 py-4 rounded-custom font-bold text-base hover:bg-blue-700 hover-transition shadow-lg shadow-blue-200">
+                SSO Employee Login
+              </button>
+<button class="bg-white border border-slate-300 text-slate-700 px-8 py-4 rounded-custom font-bold text-base hover:bg-slate-50 hover-transition">
+                Request Server Access
+              </button>
+</div>
+</div>
+<!-- Visual Element -->
+<div class="flex-1 w-full max-w-xl">
+<div class="relative bg-slate-100 rounded-custom p-4 border border-slate-200 shadow-xl overflow-hidden group">
+<img alt="Internal Storage UI" class="rounded border border-slate-200 w-full hover-transition group-hover:scale-[1.02]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZSdf0Kl2WJxf0aJvMzah9bAaFrDx2KvOKJpPmlvomYSx3BqvSoPnl_VvMCVuadWEH_QgnUDJZ1mCzSkxheUYS6djoOMAD_-q9M_v14LB_jyChld7FDj6243s11W5YPNd9I6H8XgxJmD7pzAvWTBi9OyJmlsbtpDtfO7tVVyCZwv4cSHRt1PGqNiRjk0CdsdIFpYo3wFIjhJLYjD6iBz1mEslk3Igcb-gztKQF1MRJb3-vdewCwt3_5awXBbm2arcWme3yHYVoIg4"/>
+<!-- Decorative elements for "Security" -->
+<div class="absolute top-8 right-8 bg-white p-3 rounded-lg shadow-lg border border-slate-100 flex items-center gap-3">
+<div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+<span class="text-xs font-bold text-slate-700">VPN ENCRYPTED</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- END: HeroSection -->
+<!-- BEGIN: KeyFeatures -->
+<section class="section-padding bg-slate-50" data-purpose="internal-features" id="features">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="text-center mb-16">
+<h2 class="text-3xl font-bold text-slate-900 mb-4">Internal Engineering Infrastructure</h2>
+<p class="text-slate-600 max-w-2xl mx-auto">Optimized tools designed specifically for our private CAD ecosystem and proprietary design workflows.</p>
+</div>
+<div class="grid md:grid-cols-3 gap-8">
+<!-- Feature 1 -->
+<div class="bg-white p-8 rounded-custom border border-slate-200 shadow-sm hover:shadow-md hover-transition" data-purpose="feature-card">
+<div class="w-12 h-12 bg-blue-50 text-primary rounded-lg flex items-center justify-center mb-6">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<h3 class="text-xl font-bold text-slate-900 mb-3">Secure Engineering Vault</h3>
+<p class="text-slate-600 text-sm leading-relaxed">
+              Tier-3 data center encryption for all proprietary .DWG, .STEP, and .SLDPRT files. Compliant with company IP protection policies.
+            </p>
+</div>
+<!-- Feature 2 -->
+<div class="bg-white p-8 rounded-custom border border-slate-200 shadow-sm hover:shadow-md hover-transition" data-purpose="feature-card">
+<div class="w-12 h-12 bg-blue-50 text-primary rounded-lg flex items-center justify-center mb-6">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<h3 class="text-xl font-bold text-slate-900 mb-3">Team Collaboration</h3>
+<p class="text-slate-600 text-sm leading-relaxed">
+              Enable real-time design reviews and markup sharing across global offices. Integrated with internal communication channels.
+            </p>
+</div>
+<!-- Feature 3 -->
+<div class="bg-white p-8 rounded-custom border border-slate-200 shadow-sm hover:shadow-md hover-transition" data-purpose="feature-card">
+<div class="w-12 h-12 bg-blue-50 text-primary rounded-lg flex items-center justify-center mb-6">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<h3 class="text-xl font-bold text-slate-900 mb-3">Version Control</h3>
+<p class="text-slate-600 text-sm leading-relaxed">
+              Complete history tracking for every design iteration. Revert to any state and prevent file conflicts with smart check-in/out.
+            </p>
+</div>
+</div>
+</div>
+</section>
+<!-- END: KeyFeatures -->
+<!-- BEGIN: CompanyNews -->
+<section class="section-padding bg-white" data-purpose="internal-updates" id="news">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex items-end justify-between mb-12">
+<div class="max-w-xl">
+<h2 class="text-3xl font-bold text-slate-900 mb-2">Systems &amp; Infrastructure News</h2>
+<p class="text-slate-600">Stay informed about scheduled maintenance and software rollouts.</p>
+</div>
+<a class="text-primary font-semibold text-sm hover:underline hidden sm:block" href="#">View Archives →</a>
+</div>
+<div class="space-y-4">
+<!-- News Item 1 -->
+<div class="flex items-center gap-6 p-6 rounded-custom border border-slate-100 hover:bg-slate-50 hover-transition cursor-default">
+<div class="flex-shrink-0 w-24 text-center">
+<span class="block text-2xl font-bold text-slate-900">OCT 24</span>
+<span class="text-xs text-slate-500 font-bold uppercase">Scheduled</span>
+</div>
+<div class="flex-grow">
+<h4 class="text-lg font-bold text-slate-800 mb-1">Vault Server Migration (EMEA Region)</h4>
+<p class="text-sm text-slate-600">The EMEA primary storage cluster will undergo a performance upgrade between 02:00 and 04:00 UTC.</p>
+</div>
+<div class="hidden md:block">
+<span class="px-3 py-1 bg-amber-50 text-amber-700 text-xs font-bold rounded">MAINTENANCE</span>
+</div>
+</div>
+<!-- News Item 2 -->
+<div class="flex items-center gap-6 p-6 rounded-custom border border-slate-100 hover:bg-slate-50 hover-transition cursor-default">
+<div class="flex-shrink-0 w-24 text-center">
+<span class="block text-2xl font-bold text-slate-900">OCT 20</span>
+<span class="text-xs text-slate-500 font-bold uppercase">Update</span>
+</div>
+<div class="flex-grow">
+<h4 class="text-lg font-bold text-slate-800 mb-1">SolidWorks Plugin Version 4.2 Rollout</h4>
+<p class="text-sm text-slate-600">Please update your local desktop plugins to the latest version to maintain sync compatibility.</p>
+</div>
+<div class="hidden md:block">
+<span class="px-3 py-1 bg-green-50 text-green-700 text-xs font-bold rounded">SYSTEM UPDATE</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- END: CompanyNews -->
+</main>
+<!-- BEGIN: SimpleFooter -->
+<footer class="bg-slate-900 text-slate-400 py-12" data-purpose="internal-footer">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex flex-col md:flex-row justify-between items-center gap-8 border-b border-slate-800 pb-8 mb-8">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 bg-primary rounded flex items-center justify-center text-white text-[10px] font-bold">C</div>
+<span class="text-white font-bold text-sm uppercase tracking-widest">CorpCAD Private Storage</span>
+</div>
+<div class="flex gap-8 text-xs font-medium uppercase tracking-wider">
+<a class="hover:text-white transition-colors" href="#">IT Help Desk</a>
+<a class="hover:text-white transition-colors" href="#">Security Policy</a>
+<a class="hover:text-white transition-colors" href="#">Admin Dashboard</a>
+</div>
+</div>
+<div class="flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-xs">© 2023 Company Name Inc. | Internal Use Only | Confidential Infrastructure</p>
+<div class="text-xs">
+          System Status: <span class="text-green-500 font-bold">ALL SYSTEMS OPERATIONAL</span>
+</div>
+</div>
+</div>
+</footer>
+<!-- END: SimpleFooter -->
+</body></html>

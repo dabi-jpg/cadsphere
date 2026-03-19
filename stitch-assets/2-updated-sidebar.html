@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CAD Cloud Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2b6cee",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col">
+<div class="p-6">
+<div class="flex items-center gap-3 mb-8">
+<div class="size-10 rounded-full bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined">cloud_done</span>
+</div>
+<div>
+<h1 class="text-base font-bold leading-tight">CAD Server</h1>
+<p class="text-slate-500 text-xs">Cloud Storage</p>
+</div>
+</div>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary font-medium" href="#">
+<span class="material-symbols-outlined">folder_open</span>
+<span class="text-sm">Files</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium transition-colors" href="#">
+<span class="material-symbols-outlined">star</span>
+<span class="text-sm">Starred</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium transition-colors" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-sm">Activity</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium transition-colors" href="#">
+<span class="material-symbols-outlined">folder_shared</span>
+<span class="text-sm">Shared</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium transition-colors" href="#">
+<span class="material-symbols-outlined">delete</span>
+<span class="text-sm">Trash</span>
+</a>
+<div class="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm">Settings</span>
+</a>
+</div>
+</nav>
+</div>
+<div class="mt-auto p-6">
+<button class="w-full bg-primary hover:bg-primary/90 text-white rounded-lg py-2.5 px-4 font-bold text-sm flex items-center justify-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-sm">add</span>
+                Upload New File
+            </button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col overflow-hidden">
+<!-- Header -->
+<header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between px-8">
+<div class="flex items-center gap-4 flex-1 max-w-xl">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">search</span>
+<input class="w-full pl-10 pr-4 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border-none focus:ring-2 focus:ring-primary/50 text-sm" placeholder="Search CAD projects, folders, or activity..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="h-8 w-[1px] bg-slate-200 dark:border-slate-700 mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-xs font-bold">Alex Rivera</p>
+<p class="text-[10px] text-slate-500 uppercase tracking-wider">Lead Designer</p>
+</div>
+<div class="size-9 rounded-full bg-slate-300 bg-cover bg-center border border-slate-200" data-alt="User profile avatar of Alex Rivera" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA8ARdIBxSIdIeZo4Z3qZx2jj0rytWR-VpAJ9LiUyaIueApzJByo6Y2UKbkNjDFzOowHqyPa-IDpm1gmnyAQbWsFtNPQzXg4FhJMhMmAMGhE8ayMqcrt_UHyJ6Zlhv82WH4nfN-jwdmJrM6Spo8SYKZmSgKxLttehkF5MlQkKsP2pOOitDlu4ihf9BdDsgzbSFiDp8AVZzEQ4HCM2ZkMJvszhN7877F4qXqciSCykk8CkmqiLLVVMirCGKlu93YvGhz6uS2KUIRbdg')"></div>
+</div>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="flex-1 overflow-y-auto p-8 space-y-8">
+<!-- Quick Access -->
+<section>
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-xl font-bold tracking-tight">Quick Access</h2>
+<button class="text-primary text-sm font-semibold hover:underline">View All</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Folder Cards -->
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:shadow-md transition-shadow group cursor-pointer">
+<div class="w-full aspect-video rounded-lg bg-slate-100 dark:bg-slate-800 mb-4 overflow-hidden relative">
+<div class="absolute inset-0 bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform" data-alt="3D mechanical parts blueprint rendering" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDvaxlmJeR65svNz_FC4uSok_ZfMQJ2yi2eQK__qj9PHDjve0IIA2AwjSDyZNIzc8CpiacdfpYknbbs3ee4XKby5PYbycl0flZfMeN3ksJJT5tKpWszX7A-R1SOrphgW_Hzs3u7HA7GQtZMHybT-DSq5foOFuy632PoHKL_z9mp2sHjJ4FoMHSGE9wfbLgLLAZVjRENWpApJDClbbqkax_qVW6ixYfuG_9A_Z4_Jg-gwjIR-Bmh8kk3ewCG_n7tqCXg0HDWA6iLOoM')"></div>
+</div>
+<h3 class="font-semibold text-sm">Mechanical Parts</h3>
+<p class="text-slate-500 text-xs mt-1">124 files • Updated 2h ago</p>
+</div>
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:shadow-md transition-shadow group cursor-pointer">
+<div class="w-full aspect-video rounded-lg bg-slate-100 dark:bg-slate-800 mb-4 overflow-hidden relative">
+<div class="absolute inset-0 bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform" data-alt="Architectural floor plans sketch overview" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC_PVC0CrY6XrJwMahhTUJ6oi6hAd8rPm1jwK72waL-O7SY1iKEJL6T2E39AAf8jJHi8j5qELP0YmDeiZyq2CmvrjmLtFXNfKJnWBgCOgye0Vod6ag5LwJ1pFpwX111bJQnYezbUdcesQjgcFKAcP41mwF-nOvQOeg7mREnRnvDolY8pi1B2k0rEJ9Ye5ZwTVwruKKUnBIADAqADsn_HoeH1OaKp2clHwwDk7D2mzcGi3RgolUBb9HCu_mKbs3uWGFsehBgIi4N98s')"></div>
+</div>
+<h3 class="font-semibold text-sm">Architectural Plans</h3>
+<p class="text-slate-500 text-xs mt-1">45 files • Updated 1d ago</p>
+</div>
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:shadow-md transition-shadow group cursor-pointer">
+<div class="w-full aspect-video rounded-lg bg-slate-100 dark:bg-slate-800 mb-4 overflow-hidden relative">
+<div class="absolute inset-0 bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform" data-alt="Detailed electrical circuit diagram schematic" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDu4D_sk3RE3gVOUKPR1lqKVdXotrD_2KGx7kWY92sbbe0lktYcOPKrID8t9jcI0Ow7TeXH2jQo-pINQyE3FV5anEwfRHj0awlHgbjqvuvVHeba0SJw5oAOZQc4AaNgmeGN-DdulwmDWtHSj-QLTl7cmAjyYmVCtzQCIcLT7PE6tusj0_pi3rS09q-I4w3v9NeTOBowVfs7SAor5MYD2Z48sb__aM6EGvNt2To1rflzTlUHeUKalb4s8lFSPV8RDYDsuKD7rAQR85c')"></div>
+</div>
+<h3 class="font-semibold text-sm">Electrical Diagrams</h3>
+<p class="text-slate-500 text-xs mt-1">89 files • Updated 5h ago</p>
+</div>
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:shadow-md transition-shadow group cursor-pointer">
+<div class="w-full aspect-video rounded-lg bg-slate-100 dark:bg-slate-800 mb-4 overflow-hidden relative">
+<div class="absolute inset-0 bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform" data-alt="Collection of generic 3D assets rendering" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDqUKe8iTgVXE-i64bZbX7sS7kroGGGpT9sL7F7yxoA1W5ilFsAdkWv3T1v18oMTt5wyjTLtg0tnReh_YDa1zVWpEAZaFaCEm5YTczz_S-nuZIgJerrJ4qJfeYI5SdfLHC_Mfsr01YWFwvSO0s9Ddl87HkSHVfgqTiSrTTHm1auymyLOHjWHWJDYJmRd71yBFdaKJYyL1rynJMEaYh8qXLJai-LushQhTej2RwAKJ_JDowSb2IQb5h8LXB98xX0_M5aimv2TF7sX18')"></div>
+</div>
+<h3 class="font-semibold text-sm">3D Assets</h3>
+<p class="text-slate-500 text-xs mt-1">210 files • Updated 3d ago</p>
+</div>
+</div>
+</section>
+<!-- Recent Projects List -->
+<section>
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-xl font-bold tracking-tight">Recent Projects</h2>
+<div class="flex gap-2">
+<button class="p-1.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined text-base">grid_view</span>
+</button>
+<button class="p-1.5 rounded bg-primary text-white">
+<span class="material-symbols-outlined text-base">list</span>
+</button>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">File Name</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Modified</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase text-right">Size</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr class="hover:bg-primary/5 cursor-pointer transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded">
+<span class="material-symbols-outlined">architecture</span>
+</div>
+<span class="font-medium text-sm">Turbo_Housing_v4.dwg</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">May 12, 2024</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400 text-right">45.2 MB</td>
+</tr>
+<tr class="hover:bg-primary/5 cursor-pointer transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded">
+<span class="material-symbols-outlined">precision_manufacturing</span>
+</div>
+<span class="font-medium text-sm">Chassis_Frame_A1.step</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">May 10, 2024</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400 text-right">128.8 MB</td>
+</tr>
+<tr class="hover:bg-primary/5 cursor-pointer transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-blue-400 rounded">
+<span class="material-symbols-outlined">layers</span>
+</div>
+<span class="font-medium text-sm">Bridge_Pylon_Final.rvt</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">May 08, 2024</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400 text-right">512.4 MB</td>
+</tr>
+<tr class="hover:bg-primary/5 cursor-pointer transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded">
+<span class="material-symbols-outlined">settings_input_component</span>
+</div>
+<span class="font-medium text-sm">Circuit_Module_V2.catpart</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">May 05, 2024</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400 text-right">18.3 MB</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+</main>
+<!-- Right Side Panel - Details -->
+<aside class="w-80 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hidden xl:flex flex-col">
+<div class="p-6 border-b border-slate-100 dark:border-slate-800">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-bold">File Details</h3>
+<button class="text-slate-400 hover:text-slate-600">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 mb-4 border border-dashed border-slate-200 dark:border-slate-700 flex flex-col items-center">
+<div class="size-32 bg-cover bg-center rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mb-3" data-alt="Technical preview of the selected CAD model" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCgTonSzwMcci1Vc558ZkDZ-oNJcjL30XIiO0VfM0kYOnibHWKgOjTunOPb44KTTesuBQSVzlP--bXSD6nv-wrnFPuY4NQheoYi2iQZ7XHpIAp9JJD_MW_Vrq5KKDFz91s7KvzFoySr5CQ78QxdKrOJj1dzvGBym4wLTifwK-Lc-BEPN4vX0Id4TZb1mHuPaluw6mogGqfXueZ5avVqxdTjjfHRJX6h0axVq3N_diBN8WWB4YKYWZNlMHe1iXMpJG2AoO905hITu4k')"></div>
+<p class="font-bold text-center text-sm">Turbo_Housing_v4.dwg</p>
+<p class="text-xs text-slate-500 mt-1">Uploaded by Alex Rivera</p>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between text-sm">
+<span class="text-slate-500">Project</span>
+<span class="font-medium">Turbo Engine X1</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-slate-500">File Type</span>
+<span class="font-medium">AutoCAD DWG</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-slate-500">Dimensions</span>
+<span class="font-medium">240 x 180 x 95 mm</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-slate-500">Shared with</span>
+<div class="flex -space-x-2">
+<div class="size-6 rounded-full border-2 border-white dark:border-slate-900 bg-slate-300 bg-cover" data-alt="Teammate 1 avatar" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAE95CsNIkhJ7Mr6M0netby_l9zN8hDEPOjHNb_HCiSDX_q6owuty33N-cmfVgdH6pcuh57fMsOTDAahT1hLUAxKpcvfgsHEhEuti4TnKTg39PN7HlN5nh6nl165odaRPdn4tSJtT3QxWnd6Bua1TAvPSgMt9b133Dk4oMLgbxFLpJPdG61KSvyRfpumk3fpbq-u-z27KWwTJYsCgQZar7PBU_7gwppHqoQWaXq0VujuMrpHTC7WQvdQOivUa3EJti96NgT-sXmhAw')"></div>
+<div class="size-6 rounded-full border-2 border-white dark:border-slate-900 bg-slate-300 bg-cover" data-alt="Teammate 2 avatar" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBVDhcrFrmaCDkmPmHw-uSpoAZ8XJLj8AT1MV6CuQZTDoFHfo_ecV-qlMtiF3cUMCmp4nCbcBzUohD3aCGvYU6mIscEVy0Uzs_ubEIloIdsNZKIU1vRDYNmnr64gFEGbysNBpl6gEX6hGkp0albronV1a_ebFQ7Llh5lTrsTyLx_vb49SUYQku7Gs8XXpsa_uV6NXa8lXYA6lo6Djr25E7sKTSZTcHXMu2_N9pPIfl2nHTiPsEmYX6f1W153dFXsExsRF12pDQzgAo')"></div>
+<div class="size-6 rounded-full border-2 border-white dark:border-slate-900 bg-slate-300 bg-cover" data-alt="Teammate 3 avatar" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB5okEdwKVNMQw6YuAeZJMHtX5sdvo0MEh-87oho2QOX1147mFsR5ICOJYZWs97ifNB-J1ZpdxuqrBde3EV6ncW6nMdHNlP4J1-burS6sFxi9nvFdxYY8Drh4d2xAsl1_eNCFpiumCjPfcaLD2KiqUPdWXGAvM5vmGzZZbezRPyC-c9H_ConSfMnlWUJGcEakGFD-fR6hD2K2CmR7_8vYF7BL3pY1Jic-d6etIwrOeQ2TUkHBmzKajVAZ0eiiIL-EPZSTu5XqAgR8c')"></div>
+<div class="size-6 rounded-full border-2 border-white dark:border-slate-900 bg-primary/20 flex items-center justify-center text-[8px] font-bold text-primary">+2</div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-6">
+<h3 class="font-bold mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">history</span>
+                Activity History
+            </h3>
+<div class="space-y-6 relative before:absolute before:left-[11px] before:top-2 before:bottom-0 before:w-[2px] before:bg-slate-100 dark:before:bg-slate-800">
+<div class="relative pl-8">
+<div class="absolute left-0 top-1.5 size-6 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 flex items-center justify-center z-10 border-2 border-white dark:border-slate-900">
+<span class="material-symbols-outlined text-[14px] font-bold">edit</span>
+</div>
+<p class="text-xs font-bold">Version 4.2.0 uploaded</p>
+<p class="text-[10px] text-slate-500 mt-0.5">Today at 10:45 AM</p>
+</div>
+<div class="relative pl-8">
+<div class="absolute left-0 top-1.5 size-6 rounded-full bg-green-100 dark:bg-green-900/40 text-green-600 flex items-center justify-center z-10 border-2 border-white dark:border-slate-900">
+<span class="material-symbols-outlined text-[14px] font-bold">check</span>
+</div>
+<p class="text-xs font-bold">Review requested from Sarah</p>
+<p class="text-[10px] text-slate-500 mt-0.5">Today at 09:12 AM</p>
+</div>
+<div class="relative pl-8">
+<div class="absolute left-0 top-1.5 size-6 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 flex items-center justify-center z-10 border-2 border-white dark:border-slate-900">
+<span class="material-symbols-outlined text-[14px] font-bold">visibility</span>
+</div>
+<p class="text-xs font-bold">File viewed by Mike Doe</p>
+<p class="text-[10px] text-slate-500 mt-0.5">Yesterday at 04:30 PM</p>
+</div>
+<div class="relative pl-8">
+<div class="absolute left-0 top-1.5 size-6 rounded-full bg-orange-100 dark:bg-orange-900/40 text-orange-600 flex items-center justify-center z-10 border-2 border-white dark:border-slate-900">
+<span class="material-symbols-outlined text-[14px] font-bold">comment</span>
+</div>
+<p class="text-xs font-bold">New comment on tolerance specs</p>
+<p class="text-[10px] text-slate-500 mt-0.5">Yesterday at 11:20 AM</p>
+</div>
+</div>
+</div>
+<div class="p-6 border-t border-slate-100 dark:border-slate-800 flex flex-wrap gap-2">
+<button class="flex-1 min-w-[80px] bg-primary text-white py-2 rounded-lg text-xs font-bold hover:bg-primary/90 transition-colors">View</button>
+<button class="flex-1 min-w-[80px] bg-primary/10 text-primary py-2 rounded-lg text-xs font-bold hover:bg-primary/20 transition-colors">Download</button>
+<button class="flex-1 min-w-[80px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 py-2 rounded-lg text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Share</button>
+</div>
+</aside>
+</div>
+</body></html>

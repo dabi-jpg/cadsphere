@@ -1,0 +1,95 @@
+﻿node.exe : ΓÜá Warning: 
+Next.js inferred your 
+workspace root, but it may 
+not be correct.
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" "C:\U
+sers\niran\AppData\Roaming\ 
+...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
+    + CategoryInfo          
+    : NotSpecified: (ΓÜá 
+War    ning: Ne...not be 
+correc    t.:String) [], 
+RemoteExc    eption
+    + FullyQualifiedErrorId 
+    : NativeCommandError
+ 
+ We detected multiple 
+lockfiles and selected the 
+directory of C:\Users\niran\
+package-lock.json as the 
+root directory.
+ To silence this warning, 
+set `turbopack.root` in 
+your Next.js config, or 
+consider removing one of 
+the lockfiles if it's not 
+needed.
+   See https://nextjs.org/do
+cs/app/api-reference/config/
+next-config-js/turbopack#roo
+t-directory for more 
+information.
+ Detected additional 
+lockfiles: 
+   * C:\Users\niran\.antigra
+vity\cad-platform\package-lo
+ck.json
+
+Γû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env
+
+ΓÜá The "middleware" file 
+convention is deprecated. 
+Please use "proxy" instead. 
+Learn more: https://nextjs.o
+rg/docs/messages/middleware-
+to-proxy
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 2.3s
+  Running TypeScript ...
+  Collecting page data using 31 workers ...
+  Generating static pages using 31 workers (0/17) ...
+  Generating static pages using 31 workers (4/17) 
+  Generating static pages using 31 workers (8/17) 
+  Generating static pages using 31 workers (12/17) 
+Γ£ô Generating static pages using 31 workers (17/17) in 430.4ms
+  Finalizing page optimization ...
+
+Route (app)
+Γöî Γùï /
+Γö£ Γùï /_not-found
+Γö£ ╞Æ /api/audit
+Γö£ ╞Æ /api/auth/login
+Γö£ ╞Æ /api/auth/logout
+Γö£ ╞Æ /api/auth/me
+Γö£ ╞Æ /api/auth/register
+Γö£ ╞Æ /api/files
+Γö£ ╞Æ /api/files/[id]
+Γö£ ╞Æ /api/files/[id]/download
+Γö£ ╞Æ /api/files/[id]/share
+Γö£ ╞Æ /api/files/[id]/url
+Γö£ ╞Æ /api/files/[id]/versions
+Γö£ ╞Æ /api/files/[id]/versions/[versionId]/restore
+Γö£ ╞Æ /api/files/bulk-delete
+Γö£ ╞Æ /api/files/upload
+Γö£ ╞Æ /api/folders
+Γö£ ╞Æ /api/folders/[id]
+Γö£ ╞Æ /api/share/[token]
+Γö£ Γùï /dashboard
+Γö£ Γùï /dashboard/activity
+Γö£ Γùï /login
+Γö£ Γùï /signup
+Γö£ ╞Æ /view/[token]
+Γöö ╞Æ /viewer/[id]
+
+
+╞Æ Proxy (Middleware)
+
+Γùï  (Static)   prerendered as static content
+╞Æ  (Dynamic)  server-rendered on demand
+

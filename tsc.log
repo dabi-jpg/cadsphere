@@ -1,0 +1,4 @@
+﻿components/CadViewer.tsx(57,43): error TS7016: Could not find a declaration file for module 'three-dxf'. 'C:/Users/niran/.antigravity/cad-platform/node_modules/three-dxf/dist/three-dxf.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/three-dxf` if it exists or add a new declaration (.d.ts) file containing `declare module 'three-dxf';`
+components/CadViewer.tsx(75,49): error TS7016: Could not find a declaration file for module 'occt-import-js'. 'C:/Users/niran/.antigravity/cad-platform/node_modules/occt-import-js/dist/occt-import-js.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/occt-import-js` if it exists or add a new declaration (.d.ts) file containing `declare module 'occt-import-js';`
