@@ -41,7 +41,7 @@ export async function GET(
         versionNumber: true,
         size: true,
         note: true,
-        createdAt: true,
+        uploadedAt: true,
       },
       orderBy: { versionNumber: 'desc' },
     });
