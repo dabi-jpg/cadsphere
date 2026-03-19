@@ -107,6 +107,27 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
 
   // ─── Route Protection ─────────────────────────────────────────────
+  const PROTECTED_API_ROUTES = [
+    '/api/files',
+    '/api/folders',
+    '/api/trash',
+    '/api/starred',
+    '/api/shared',
+    '/api/activity',
+    '/api/audit'
+  ];
+
+  const isProtectedApiRoute = PROTECTED_API_ROUTES.some((route) =>
+    pathname.startsWith(route)
+  );
+
+  if (isProtectedApiRoute && !user) {
+    return NextResponse.json(
+      { error: "Unauthorized", code: "UNAUTHORIZED" },
+      { status: 401 }
+    );
+  }
+
   const isProtectedRoute = PROTECTED_ROUTES.some((route) =>
     pathname.startsWith(route)
   );
@@ -128,6 +149,14 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    '/dashboard/:path*',
+    '/api/files/:path*',
+    '/api/folders/:path*',
+    '/api/trash/:path*',
+    '/api/starred/:path*',
+    '/api/shared/:path*',
+    '/api/activity/:path*',
+    '/api/audit/:path*',
     /*
      * Match all request paths except:
      * - _next/static (static files)
