@@ -64,5 +64,7 @@ export async function requireAuth() {
     },
   });
 
+  console.log('requireAuth returning dbUser.id:', dbUser.id, 'email:', dbUser.email)
+
   return { supabaseUser, dbUser };
 }

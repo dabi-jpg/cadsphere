@@ -10,6 +10,9 @@ export async function GET(request: Request) {
   try {
     const { dbUser } = await requireAuth()
     
+    console.log('API /files called by dbUser.id:', dbUser.id)
+    console.log('API /files called by dbUser.email:', dbUser.email)
+    
     const { searchParams } = new URL(request.url)
     const q = searchParams.get('q')
     const folderId = searchParams.get('folderId')
