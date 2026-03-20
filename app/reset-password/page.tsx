@@ -19,50 +19,26 @@ export default function ResetPasswordPage() {
   )
 
   useEffect(() => {
-    // First check if there's already a valid session from the hash
-    const hashParams = new URLSearchParams(
-      window.location.hash.substring(1)
-    )
-    const accessToken = hashParams.get('access_token')
-    const refreshToken = hashParams.get('refresh_token')
-    const type = hashParams.get('type')
-
-    if (accessToken && type === 'recovery') {
-      // Set the session manually from the hash tokens
-      supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken ?? '',
-      }).then(({ error }) => {
-        if (error) {
-          toast.error('Invalid or expired reset link')
-          setChecking(false)
-        } else {
-          setValidSession(true)
-          setChecking(false)
-          // Clean the URL hash
-          window.history.replaceState(null, '', window.location.pathname)
-        }
-      })
-      return
-    }
-
-    // Also listen for PASSWORD_RECOVERY event
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'PASSWORD_RECOVERY' && session) {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      console.log('Session on reset page:', !!session)
+      if (session) {
         setValidSession(true)
-        setChecking(false)
+      } else {
+        // Listen for PASSWORD_RECOVERY event as fallback
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+          console.log('Auth event:', event, !!session)
+          if ((event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') && session) {
+            setValidSession(true)
+            setChecking(false)
+          }
+        })
+        setTimeout(() => setChecking(false), 3000)
+        return () => subscription.unsubscribe()
       }
-    })
-
-    // If no hash tokens found after 3 seconds, show error
-    const timeout = setTimeout(() => {
       setChecking(false)
-    }, 3000)
-
-    return () => {
-      subscription.unsubscribe()
-      clearTimeout(timeout)
     }
+    checkSession()
   }, [])
 
   const handleReset = async (e: React.FormEvent) => {

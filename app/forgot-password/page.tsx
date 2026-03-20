@@ -1,11 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { createBrowserClient } from '@supabase/ssr'
 import { toast } from 'sonner'
+import { useSearchParams } from 'next/navigation'
 
-export default function ForgotPasswordPage() {
+function ForgotPasswordContent() {
+  const searchParams = useSearchParams()
+  const errorParam = searchParams.get('error')
+  const isInvalidLink = errorParam === 'invalid_link'
+
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
@@ -20,7 +25,7 @@ export default function ForgotPasswordPage() {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
       )
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://cadsphere.vercel.app/reset-password',
+        redirectTo: 'https://cadsphere.vercel.app/auth/callback?next=/reset-password',
       })
       if (error) toast.error(error.message)
       else { toast.success('Reset email sent! Check your inbox.'); setEmailSent(true) }
@@ -48,10 +53,14 @@ export default function ForgotPasswordPage() {
               <div className="w-12 h-12 bg-primary-container text-primary rounded-full flex items-center justify-center mb-6">
                 <span className="material-symbols-outlined text-2xl">lock_reset</span>
               </div>
-              <h1 className="text-xl font-bold text-on-surface mb-2 tracking-tight">Forgot Password?</h1>
+              <h1 className="text-xl font-bold text-on-surface mb-2 tracking-tight">
+                {isInvalidLink ? "Link Expired" : "Forgot Password?"}
+              </h1>
               <p className="text-sm text-on-surface-variant max-w-[280px]">
                 {emailSent 
                   ? "Check your email for a reset link. You can close this window securely."
+                  : isInvalidLink
+                  ? "This reset link has expired or is invalid. Please request a new one below."
                   : "Enter your email address to receive instructions to reset your password."}
               </p>
             </div>
@@ -124,5 +133,13 @@ export default function ForgotPasswordPage() {
         </div>
       </footer>
     </div>
+  )
+}
+
+export default function ForgotPasswordPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ForgotPasswordContent />
+    </Suspense>
   )
 }
