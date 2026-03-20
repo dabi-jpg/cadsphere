@@ -10,6 +10,7 @@ export default function ResetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [validSession, setValidSession] = useState(false)
+  const [checking, setChecking] = useState(true)
   const router = useRouter()
 
   const supabase = createBrowserClient(
@@ -18,9 +19,50 @@ export default function ResetPasswordPage() {
   )
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY') setValidSession(true)
+    // First check if there's already a valid session from the hash
+    const hashParams = new URLSearchParams(
+      window.location.hash.substring(1)
+    )
+    const accessToken = hashParams.get('access_token')
+    const refreshToken = hashParams.get('refresh_token')
+    const type = hashParams.get('type')
+
+    if (accessToken && type === 'recovery') {
+      // Set the session manually from the hash tokens
+      supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken ?? '',
+      }).then(({ error }) => {
+        if (error) {
+          toast.error('Invalid or expired reset link')
+          setChecking(false)
+        } else {
+          setValidSession(true)
+          setChecking(false)
+          // Clean the URL hash
+          window.history.replaceState(null, '', window.location.pathname)
+        }
+      })
+      return
+    }
+
+    // Also listen for PASSWORD_RECOVERY event
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY' && session) {
+        setValidSession(true)
+        setChecking(false)
+      }
     })
+
+    // If no hash tokens found after 3 seconds, show error
+    const timeout = setTimeout(() => {
+      setChecking(false)
+    }, 3000)
+
+    return () => {
+      subscription.unsubscribe()
+      clearTimeout(timeout)
+    }
   }, [])
 
   const handleReset = async (e: React.FormEvent) => {
@@ -55,15 +97,21 @@ export default function ResetPasswordPage() {
       <main className="flex-grow flex items-center justify-center px-4 pt-16">
         <div className="w-full max-w-md bg-surface border border-outline-variant p-8 rounded-lg shadow-sm z-10 relative">
           
-          {!validSession ? (
+          {checking ? (
             <div className="flex flex-col gap-6 text-center py-8">
               <span className="material-symbols-outlined text-4xl text-secondary animate-pulse">hourglass_empty</span>
               <h2 className="text-xl font-bold text-on-surface">Validating Session...</h2>
               <p className="text-sm text-on-surface-variant">Please wait while we verify your secure link.</p>
+            </div>
+          ) : !validSession ? (
+            <div className="flex flex-col gap-6 text-center py-8">
+              <span className="material-symbols-outlined text-4xl text-error">error</span>
+              <h2 className="text-xl font-bold text-on-surface">Invalid or Expired Link</h2>
+              <p className="text-sm text-on-surface-variant">This password reset link is invalid or has expired.</p>
               <div className="mt-4 pt-6 text-center">
                 <Link className="text-[0.875rem] text-primary font-medium hover:underline flex items-center justify-center gap-1" href="/forgot-password">
                   <span className="material-symbols-outlined text-[18px]">chevron_left</span>
-                  Return to Forgot Password
+                  Request new reset link
                 </Link>
               </div>
             </div>
