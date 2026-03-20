@@ -20,7 +20,7 @@ export default function ForgotPasswordPage() {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
       )
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: 'https://cadsphere.vercel.app/reset-password',
       })
       if (error) toast.error(error.message)
       else { toast.success('Reset email sent! Check your inbox.'); setEmailSent(true) }
