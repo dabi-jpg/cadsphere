@@ -101,16 +101,12 @@ function SceneContent({
   return (
     <>
       <color attach="background" args={["#1a1a2e"]} />
-      <ambientLight intensity={1.2} />
-      <directionalLight
-        castShadow
-        position={[50, 50, 50]}
-        intensity={2}
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-      />
-      <directionalLight position={[-50, -50, -50]} intensity={0.8} color={0x6366f1} />
-      <directionalLight position={[-50, 50, 0]} intensity={0.5} />
+      {/* Manual Lighting (Replaces CSP-blocked Environment preset) */}
+      <ambientLight intensity={1.5} />
+      <directionalLight castShadow position={[50, 50, 50]} intensity={2.5} />
+      <directionalLight position={[-50, -50, -50]} intensity={1} color={0x6366f1} />
+      <directionalLight position={[0, 50, -50]} intensity={0.8} />
+      <pointLight position={[0, 100, 0]} intensity={1} />
 
       <Grid
         infiniteGrid
@@ -125,7 +121,6 @@ function SceneContent({
 
       <AutoFitCamera group={group} />
       <OrbitControls makeDefault enableDamping dampingFactor={0.05} />
-      <Environment preset="studio" />
     </>
   );
 }

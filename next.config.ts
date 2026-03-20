@@ -66,12 +66,15 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [];
   },
-  webpack: (config: any) => {
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      fs: false,
-      path: false,
-    };
+  webpack: (config: any, { isServer }: { isServer: boolean }) => {
+    // Only disable fs/path for the client bundle
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+      };
+    }
     config.experiments = {
       ...config.experiments,
       asyncWebAssembly: true,
