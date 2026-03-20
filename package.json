@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "postinstall": "node -e \"require('fs').copyFileSync('node_modules/occt-import-js/dist/occt-import-js.wasm', 'public/occt-import-js.wasm')\""
   },
   "dependencies": {
     "@base-ui/react": "^1.2.0",

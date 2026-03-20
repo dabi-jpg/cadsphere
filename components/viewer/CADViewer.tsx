@@ -365,10 +365,16 @@ export default function CADViewer({
           ext === ".igs" ||
           ext === ".iges"
         ) {
-          const initOpenCascade = (await import("occt-import-js")).default;
-          const occt = await initOpenCascade({
-            locateFile: () => `/occt-import-js.wasm`,
-          });
+          try {
+            const initOpenCascade = (await import("occt-import-js")).default;
+            const occt = await initOpenCascade({
+              locateFile: (path: string) => {
+                if (path.endsWith(".wasm")) return "/occt-import-js.wasm";
+                return path;
+              },
+            });
+
+            if (!occt) throw new Error("OCCT failed to initialize");
 
           const fileData = new Uint8Array(arrayBuffer);
           const virtualFileName = `model${ext}`;
@@ -425,7 +431,11 @@ export default function CADViewer({
           } catch {
             // Ignore cleanup errors
           }
-        } else {
+        } catch (err) {
+          console.error("OCCT error:", err);
+          throw new Error("Failed to load 3D engine. Please try refreshing.");
+        }
+      } else {
           throw new Error(`Unsupported file format: ${ext}`);
         }
 
