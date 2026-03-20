@@ -167,7 +167,7 @@ export default function Dashboard() {
 
   // ─── Upload ──────────────────────────────────────────────────────────
   const uploadFile = useCallback(async (file: File) => {
-    const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
+    const ext = '.' + file.name.split('.').pop()?.toLowerCase();
     if (!ALLOWED_CAD_EXTENSIONS.includes(ext as typeof ALLOWED_CAD_EXTENSIONS[number])) {
       toast.error(`Invalid file type "${ext}". Allowed: ${ALLOWED_EXTENSIONS_DISPLAY}`);
       return;
@@ -181,48 +181,75 @@ export default function Dashboard() {
     setUploadProgress(0);
     setUploadFilename(file.name);
 
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
+      // Step 1: Get signed upload URL
+      const presignRes = await fetch('/api/files/upload/presign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          filename: file.name,
+          filetype: ext.replace('.', ''),
+          size: file.size,
+        }),
+      });
+
+      if (!presignRes.ok) {
+        const d = await presignRes.json();
+        throw new Error(d.error || 'Failed to get upload URL');
+      }
+
+      const { signedUrl, storagePath } = await presignRes.json();
+
+      // Step 2: Upload directly to Supabase Storage using XHR for progress
       await new Promise<void>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
-
-        xhr.upload.addEventListener("progress", (e) => {
+        xhr.upload.addEventListener('progress', (e) => {
           if (e.lengthComputable) {
             setUploadProgress(Math.round((e.loaded / e.total) * 100));
           }
         });
-
-        xhr.addEventListener("load", () => {
-          if (xhr.status === 201) {
+        xhr.addEventListener('load', () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
             resolve();
           } else {
-            try {
-              const d = JSON.parse(xhr.responseText);
-              reject(new Error(d.error || `Upload failed (${xhr.status})`));
-            } catch {
-              reject(new Error(`Upload failed (${xhr.status})`));
-            }
+            reject(new Error(`Upload failed with status ${xhr.status}`));
           }
         });
-
-        xhr.addEventListener("error", () => reject(new Error("Network error during upload")));
-        xhr.open("POST", "/api/files/upload");
-        xhr.send(formData);
+        xhr.addEventListener('error', () => reject(new Error('Network error during upload')));
+        xhr.open('PUT', signedUrl);
+        xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+        xhr.send(file);
       });
+
+      // Step 3: Save metadata to database
+      const completeRes = await fetch('/api/files/upload/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          filename: file.name,
+          filetype: ext.replace('.', ''),
+          size: file.size,
+          storagePath,
+          folderId: selectedFolderId,
+        }),
+      });
+
+      if (!completeRes.ok) {
+        const d = await completeRes.json();
+        throw new Error(d.error || 'Failed to save file');
+      }
 
       toast.success(`${file.name} uploaded successfully`);
       await fetchFiles();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Upload failed");
+      toast.error(err instanceof Error ? err.message : 'Upload failed');
     } finally {
       setUploading(false);
       setUploadProgress(0);
-      setUploadFilename("");
-      if (fileInputRef.current) fileInputRef.current.value = "";
+      setUploadFilename('');
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
-  }, [fetchFiles]);
+  }, [fetchFiles, selectedFolderId]);
 
   // ─── Drag & Drop ────────────────────────────────────────────────────
   const handleDragEnter = useCallback((e: React.DragEvent) => {
