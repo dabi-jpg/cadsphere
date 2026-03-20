@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+export const maxDuration = 60; // 60 seconds timeout for large uploads
 import { requireAuth } from '@/lib/auth';
 import { handleApiError, ApiError } from '@/lib/api-error';
 import { prisma } from '@/lib/prisma';
@@ -8,7 +12,7 @@ import { logActivity } from '@/lib/activity';
 import { rateLimit } from '@/lib/rate-limit';
 import { sanitizeFile } from '@/lib/sanitize';
 
-const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+const MAX_FILE_SIZE = 210 * 1024 * 1024; // 210MB
 const MAX_FILENAME_LENGTH = 255;
 
 export async function POST(request: Request) {

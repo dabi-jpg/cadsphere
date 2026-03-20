@@ -6,6 +6,11 @@ const nextConfig: NextConfig = {
    * serverExternalPackages ensures Prisma client works correctly in API routes.
    */
   serverExternalPackages: ["@prisma/client"],
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '210mb',
+    },
+  },
 
   /**
    * Turbopack configuration.
@@ -48,6 +53,12 @@ const nextConfig: NextConfig = {
         headers: [
           { key: "Cache-Control", value: "no-store, no-cache, must-revalidate" },
           { key: "X-Content-Type-Options", value: "nosniff" },
+        ],
+      },
+      {
+        source: "/api/files/upload",
+        headers: [
+          { key: "Cache-Control", value: "no-store, no-cache, must-revalidate" },
         ],
       },
     ];
