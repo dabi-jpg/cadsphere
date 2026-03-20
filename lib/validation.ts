@@ -8,7 +8,10 @@ import { z } from "zod";
 
 // ─── CAD File Constants ───────────────────────────────────────────────
 /** Allowed CAD file extensions (lowercase, with dot prefix) */
-export const ALLOWED_CAD_EXTENSIONS = [".stl", ".step", ".stp", ".dxf", ".igs", ".iges"] as const;
+export const ALLOWED_CAD_EXTENSIONS = [
+  ".stl", ".step", ".stp", ".dxf", ".igs", ".iges",
+  ".obj", ".3mf", ".ply", ".ifc", ".dwg", ".svg", ".f3d"
+] as const;
 
 /** Human-readable list for error messages */
 export const ALLOWED_EXTENSIONS_DISPLAY = ALLOWED_CAD_EXTENSIONS.join(", ");

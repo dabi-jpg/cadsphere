@@ -1,3 +1,5 @@
+import 'react';
+
 declare module 'occt-import-js' {
   interface OcctMesh {
     attributes: {
@@ -39,4 +41,11 @@ declare module 'occt-import-js' {
 declare module 'three/examples/jsm/loaders/STLLoader.js' {
   import { STLLoader } from 'three-stdlib';
   export { STLLoader };
+}
+
+declare module 'react' {
+  interface InputHTMLAttributes<T> {
+    webkitdirectory?: string;
+    directory?: string;
+  }
 }

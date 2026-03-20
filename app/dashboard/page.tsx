@@ -16,6 +16,14 @@ import {
 import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
 
 // ─── Types ─────────────────────────────────────────────────────────────
+interface UploadItem {
+  id: string;
+  filename: string;
+  progress: number;
+  status: 'pending' | 'uploading' | 'done' | 'error';
+  error?: string;
+}
+
 interface FileItem {
   id: string;
   filename: string;
@@ -80,9 +88,11 @@ export default function Dashboard() {
   const [summary, setSummary] = useState<StorageSummary | null>(null);
   const [userProfile, setUserProfile] = useState<{ name: string | null; avatarUrl: string | null; email: string | null } | null>(null);
   const [loadingFiles, setLoadingFiles] = useState(true);
-  const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [uploadFilename, setUploadFilename] = useState("");
+  
+  // New upload state
+  const [uploadQueue, setUploadQueue] = useState<UploadItem[]>([]);
+  const [showUploadPanel, setShowUploadPanel] = useState(false);
+  
   const [isDragOver, setIsDragOver] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
@@ -98,6 +108,7 @@ export default function Dashboard() {
   const [newFolderName, setNewFolderName] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const folderInputRef = useRef<HTMLInputElement>(null);
   const dragCounterRef = useRef(0);
   const profileRef = useRef<HTMLDivElement>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -166,62 +177,52 @@ export default function Dashboard() {
   }, [fetchFiles]);
 
   // ─── Upload ──────────────────────────────────────────────────────────
-  const uploadFile = useCallback(async (file: File) => {
+  const updateUploadItem = useCallback((id: string, updates: Partial<UploadItem>) => {
+    setUploadQueue(prev => prev.map(item => item.id === id ? { ...item, ...updates } : item));
+  }, []);
+
+  const uploadSingleFile = async (file: File, folderId?: string): Promise<void> => {
+    const id = Math.random().toString(36).slice(2);
     const ext = '.' + file.name.split('.').pop()?.toLowerCase();
+
     if (!ALLOWED_CAD_EXTENSIONS.includes(ext as typeof ALLOWED_CAD_EXTENSIONS[number])) {
-      toast.error(`Invalid file type "${ext}". Allowed: ${ALLOWED_EXTENSIONS_DISPLAY}`);
+      setUploadQueue(prev => [...prev, { id, filename: file.name, progress: 0, status: 'error', error: `Invalid type ${ext}` }]);
       return;
     }
     if (file.size > MAX_FILE_SIZE_BYTES) {
-      toast.error(`File exceeds ${MAX_FILE_SIZE_DISPLAY} limit`);
+      setUploadQueue(prev => [...prev, { id, filename: file.name, progress: 0, status: 'error', error: 'Exceeds 200MB limit' }]);
       return;
     }
 
-    setUploading(true);
-    setUploadProgress(0);
-    setUploadFilename(file.name);
+    setUploadQueue(prev => [...prev, { id, filename: file.name, progress: 0, status: 'uploading' }]);
 
     try {
-      // Step 1: Get signed upload URL
       const presignRes = await fetch('/api/files/upload/presign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          filename: file.name,
-          filetype: ext.replace('.', ''),
-          size: file.size,
-        }),
+        body: JSON.stringify({ filename: file.name, filetype: ext.replace('.', ''), size: file.size }),
       });
-
       if (!presignRes.ok) {
         const d = await presignRes.json();
         throw new Error(d.error || 'Failed to get upload URL');
       }
-
       const { signedUrl, storagePath } = await presignRes.json();
 
-      // Step 2: Upload directly to Supabase Storage using XHR for progress
       await new Promise<void>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.upload.addEventListener('progress', (e) => {
-          if (e.lengthComputable) {
-            setUploadProgress(Math.round((e.loaded / e.total) * 100));
-          }
+          if (e.lengthComputable) updateUploadItem(id, { progress: Math.round((e.loaded / e.total) * 100) });
         });
         xhr.addEventListener('load', () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            resolve();
-          } else {
-            reject(new Error(`Upload failed with status ${xhr.status}`));
-          }
+          if (xhr.status >= 200 && xhr.status < 300) resolve();
+          else reject(new Error(`Upload failed ${xhr.status}`));
         });
-        xhr.addEventListener('error', () => reject(new Error('Network error during upload')));
+        xhr.addEventListener('error', () => reject(new Error('Network error')));
         xhr.open('PUT', signedUrl);
         xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
         xhr.send(file);
       });
 
-      // Step 3: Save metadata to database
       const completeRes = await fetch('/api/files/upload/complete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -230,26 +231,50 @@ export default function Dashboard() {
           filetype: ext.replace('.', ''),
           size: file.size,
           storagePath,
-          folderId: selectedFolderId,
+          folderId: folderId ?? null,
         }),
       });
-
       if (!completeRes.ok) {
         const d = await completeRes.json();
         throw new Error(d.error || 'Failed to save file');
       }
-
-      toast.success(`${file.name} uploaded successfully`);
-      await fetchFiles();
+      updateUploadItem(id, { status: 'done', progress: 100 });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Upload failed');
-    } finally {
-      setUploading(false);
-      setUploadProgress(0);
-      setUploadFilename('');
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      updateUploadItem(id, { status: 'error', error: err instanceof Error ? err.message : 'Failed' });
     }
+  };
+
+  const uploadFiles = useCallback(async (files: File[]) => {
+    setShowUploadPanel(true);
+    const chunks: File[][] = [];
+    for (let i = 0; i < files.length; i += 3) chunks.push(files.slice(i, i + 3));
+    for (const chunk of chunks) await Promise.all(chunk.map(f => uploadSingleFile(f, selectedFolderId ?? undefined)));
+    await fetchFiles();
+    toast.success(`${files.length} file${files.length > 1 ? 's' : ''} uploaded successfully`);
   }, [fetchFiles, selectedFolderId]);
+
+  const uploadFolder = useCallback(async (files: File[]) => {
+    if (files.length === 0) return;
+    setShowUploadPanel(true);
+    const firstFile = files[0] as any;
+    const folderName = firstFile.webkitRelativePath
+      ? firstFile.webkitRelativePath.split('/')[0]
+      : 'Uploaded Folder';
+
+    const folderRes = await fetch('/api/folders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: folderName }),
+    });
+    const folderData = await folderRes.json();
+    const folderId = folderData.folder?.id ?? folderData.id ?? null;
+
+    const chunks: File[][] = [];
+    for (let i = 0; i < files.length; i += 3) chunks.push(files.slice(i, i + 3));
+    for (const chunk of chunks) await Promise.all(chunk.map(f => uploadSingleFile(f, folderId)));
+    await fetchFiles();
+    toast.success(`Folder "${folderName}" uploaded with ${files.length} files`);
+  }, [fetchFiles]);
 
   // ─── Drag & Drop ────────────────────────────────────────────────────
   const handleDragEnter = useCallback((e: React.DragEvent) => {
@@ -272,9 +297,9 @@ export default function Dashboard() {
     e.preventDefault(); e.stopPropagation();
     setIsDragOver(false);
     dragCounterRef.current = 0;
-    const file = e.dataTransfer.files?.[0];
-    if (file) await uploadFile(file);
-  }, [uploadFile]);
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) await uploadFiles(files);
+  }, [uploadFiles]);
 
   // ─── Delete ──────────────────────────────────────────────────────────
   const handleDelete = useCallback(async (fileId: string, filename: string) => {
@@ -547,14 +572,12 @@ export default function Dashboard() {
                   </div>
                 );
               })}
-
-              {/* Action cards */}
               <div
-                onClick={() => setIsNewFolderModalOpen(true)}
-                className="bg-white border border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center p-4 hover:bg-slate-50 hover:border-primary/50 cursor-pointer transition-all text-slate-500 hover:text-primary min-h-[140px]"
+                onClick={() => folderInputRef.current?.click()}
+                className="bg-white border border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center p-4 hover:bg-slate-50 hover:border-primary cursor-pointer transition-all text-slate-500 hover:text-primary min-h-[140px]"
               >
-                <span className="material-symbols-outlined mb-2 text-2xl">create_new_folder</span>
-                <span className="text-sm font-semibold">New Folder</span>
+                <span className="material-symbols-outlined mb-2 text-2xl">drive_folder_upload</span>
+                <span className="text-sm font-semibold">Upload Folder</span>
               </div>
               <div
                 onClick={() => fileInputRef.current?.click()}
@@ -890,33 +913,60 @@ export default function Dashboard() {
         )}
       </aside>
 
-      {/* ── Hidden file input ────────────────────────────────────────── */}
+      {/* ── Hidden file inputs ───────────────────────────────────────── */}
       <input
         type="file"
         ref={fileInputRef}
         className="hidden"
         accept={ALLOWED_CAD_EXTENSIONS.join(",")}
-        onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadFile(f); }}
+        multiple
+        onChange={(e) => {
+          const files = Array.from(e.target.files || [])
+          if (files.length > 0) uploadFiles(files)
+        }}
+      />
+      <input
+        type="file"
+        ref={folderInputRef}
+        className="hidden"
+        webkitdirectory=""
+        multiple
+        onChange={(e) => {
+          const files = Array.from(e.target.files || [])
+          if (files.length > 0) uploadFolder(files)
+        }}
       />
 
-      {/* ── Upload progress modal ────────────────────────────────────── */}
-      {uploading && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center">
-            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="material-symbols-outlined text-primary text-2xl">cloud_upload</span>
-            </div>
-            <h3 className="text-base font-bold text-slate-900 mb-1">Uploading file...</h3>
-            {uploadFilename && (
-              <p className="text-xs text-slate-500 mb-4 truncate px-4">{uploadFilename}</p>
-            )}
-            <div className="w-full bg-slate-100 rounded-full h-2 mb-2 overflow-hidden">
-              <div
-                className="bg-primary h-2 rounded-full transition-all duration-300"
-                style={{ width: `${uploadProgress}%` }}
-              />
-            </div>
-            <p className="text-sm font-semibold text-slate-600">{uploadProgress}%</p>
+      {/* ── Upload Panel ─────────────────────────────────────────────── */}
+      {showUploadPanel && uploadQueue.length > 0 && (
+        <div className="fixed bottom-4 right-4 z-50 bg-white border border-slate-200 rounded-xl shadow-xl w-80 max-h-96 overflow-hidden flex flex-col">
+          <div className="flex items-center justify-between p-3 border-b border-slate-100">
+            <span className="text-sm font-semibold text-slate-800">
+              {uploadQueue.filter(u => u.status === 'uploading').length > 0
+                ? `Uploading ${uploadQueue.filter(u => u.status === 'uploading').length} files...`
+                : `${uploadQueue.filter(u => u.status === 'done').length}/${uploadQueue.length} done`}
+            </span>
+            <button onClick={() => { setShowUploadPanel(false); setUploadQueue([]) }} className="text-slate-400 hover:text-slate-600">
+              <span className="material-symbols-outlined text-[18px]">close</span>
+            </button>
+          </div>
+          <div className="overflow-y-auto flex-1 p-2 space-y-2">
+            {uploadQueue.map(item => (
+              <div key={item.id} className="p-2 rounded-lg bg-slate-50">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-slate-700 truncate flex-1 mr-2">{item.filename}</span>
+                  {item.status === 'done' && <span className="material-symbols-outlined text-green-500 text-[16px]">check_circle</span>}
+                  {item.status === 'error' && <span className="material-symbols-outlined text-red-500 text-[16px]">error</span>}
+                  {item.status === 'uploading' && <span className="text-xs text-primary font-medium">{item.progress}%</span>}
+                </div>
+                {item.status === 'uploading' && (
+                  <div className="w-full bg-slate-200 rounded-full h-1 overflow-hidden">
+                    <div className="bg-primary h-1 rounded-full transition-all duration-300" style={{ width: `${item.progress}%` }} />
+                  </div>
+                )}
+                {item.status === 'error' && <p className="text-xs text-red-500 mt-0.5">{item.error}</p>}
+              </div>
+            ))}
           </div>
         </div>
       )}

@@ -76,39 +76,30 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { dbUser } = await requireAuth();
-    const resolvedParams = await params;
-    const folderId = resolvedParams.id;
+    const { dbUser } = await requireAuth()
+    const resolvedParams = await params
+    const folderId = resolvedParams.id
 
-    if (!uuidSchema.safeParse(folderId).success) {
-      throw new ApiError('Invalid folder ID', 'VALIDATION_ERROR', 400);
-    }
-
-    const folder = await prisma.folder.findUnique({
-      where: { id: folderId, userId: dbUser.id },
-    });
-
-    if (!folder) {
-      throw new ApiError('Folder not found', 'NOT_FOUND', 404);
-    }
-
-    await prisma.folder.delete({
-      where: { id: folderId },
-    });
-
-    logActivity({
-      userId: dbUser.id,
-      action: 'FOLDER_DELETED',
-      metadata: { folderId, name: folder.name },
-    });
-
-    return new NextResponse(null, { status: 204 });
-  } catch (error) {
-    return handleApiError(error);
+    const folder = await prisma.folder.findUnique({ where: { id: folderId } })
+    if (!folder) throw new ApiError('Folder not found', 'NOT_FOUND', 404)
+    if (folder.userId !== dbUser.id) throw new ApiError('Forbidden', 'FORBIDDEN', 403)
+    
+    await prisma.file.updateMany({
+      where: { folderId, userId: dbUser.id },
+      data: { folderId: null }
+    })
+    
+    await prisma.folder.updateMany({
+      where: { parentId: folderId, userId: dbUser.id },
+      data: { parentId: null }
+    })
+    
+    await prisma.folder.delete({ where: { id: folderId } })
+    
+    return Response.json({ success: true })
+  } catch (err) {
+    return handleApiError(err)
   }
 }
