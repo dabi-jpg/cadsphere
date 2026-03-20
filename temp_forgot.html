@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Blueprint CAD - Forgot Password</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary": "#7c3aed",
+              "on-primary": "#ffffff",
+              "primary-fixed-dim": "#bfdbfe",
+              "on-primary-fixed-variant": "#1d4ed8",
+              "surface-tint": "#2b6cee",
+              "secondary-fixed": "#f1f5f9",
+              "secondary": "#475569",
+              "on-secondary-fixed": "#0f172a",
+              "surface": "#ffffff",
+              "primary": "#2b6cee",
+              "on-tertiary-fixed": "#2e1065",
+              "on-tertiary": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "on-error": "#ffffff",
+              "tertiary-container": "#ede9fe",
+              "secondary-fixed-dim": "#e2e8f0",
+              "inverse-on-surface": "#f1f5f9",
+              "tertiary-fixed": "#f5f3ff",
+              "on-primary-fixed": "#1e3a8a",
+              "on-secondary-fixed-variant": "#334155",
+              "on-background": "#0f172a",
+              "outline": "#cbd5e1",
+              "surface-container-high": "#e9edf5",
+              "on-surface-variant": "#64748b",
+              "surface-dim": "#f6f6f8",
+              "inverse-primary": "#93c5fd",
+              "error-container": "#fee2e2",
+              "tertiary-fixed-dim": "#ede9fe",
+              "surface-container-low": "#f8f9fc",
+              "on-error-container": "#991b1b",
+              "primary-container": "#dbeafe",
+              "surface-bright": "#ffffff",
+              "primary-fixed": "#dbeafe",
+              "on-tertiary-container": "#5b21b6",
+              "on-secondary-container": "#1e293b",
+              "surface-container": "#f1f3f9",
+              "surface-container-highest": "#dee3f0",
+              "on-surface": "#0f172a",
+              "on-tertiary-fixed-variant": "#6d28d9",
+              "on-primary-container": "#1e40af",
+              "on-secondary": "#ffffff",
+              "background": "#f6f6f8",
+              "outline-variant": "#e2e8f0",
+              "secondary-container": "#f1f5f9",
+              "error": "#ef4444",
+              "inverse-surface": "#1e293b",
+              "surface-variant": "#f1f5f9"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<nav class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center w-full px-6 h-16 max-w-full">
+<div class="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-50">Blueprint CAD</div>
+<div class="flex items-center gap-6">
+<div class="hidden md:flex gap-6">
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 font-inter text-sm font-medium uppercase tracking-wider transition-colors" href="#">Support</a>
+<a class="text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 pb-1 font-inter text-sm font-medium uppercase tracking-wider" href="#">Login</a>
+</div>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">Contact IT</button>
+</div>
+</nav>
+<main class="flex-grow flex items-center justify-center px-4 py-12">
+<div class="w-full max-w-[440px]">
+<div class="bg-surface p-8 md:p-10 rounded-xl outline outline-1 outline-outline-variant shadow-sm">
+<div class="flex flex-col items-center mb-8 text-center">
+<div class="w-12 h-12 bg-primary-container text-primary rounded-full flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-2xl" data-icon="lock_reset">lock_reset</span>
+</div>
+<h1 class="text-xl font-bold text-on-surface mb-2 tracking-tight">Forgot Password?</h1>
+<p class="text-sm text-on-surface-variant max-w-[280px]">
+                        Enter your email address to receive instructions to reset your password.
+                    </p>
+</div>
+<form class="space-y-6">
+<div class="space-y-1.5">
+<label class="text-[10px] font-bold uppercase tracking-widest text-secondary" for="email">Work Email Address</label>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline text-lg" data-icon="mail">mail</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-3 bg-surface-container-low border border-outline-variant rounded-lg text-sm placeholder-outline focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none" id="email" name="email" placeholder="name@company.com" required="" type="email"/>
+</div>
+</div>
+<div class="pt-2">
+<button class="w-full bg-primary text-on-primary py-3 px-4 rounded-lg font-semibold text-sm hover:opacity-95 transition-opacity active:opacity-80 flex items-center justify-center gap-2" type="submit">
+<span>Continue</span>
+<span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<div class="text-center">
+<a class="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline decoration-2 underline-offset-4" href="#">
+<span class="material-symbols-outlined text-base" data-icon="arrow_back">arrow_back</span>
+                            Back to Login
+                        </a>
+</div>
+</form>
+</div>
+<div class="mt-8 flex flex-col items-center gap-4 text-center">
+<div class="h-[1px] w-full bg-outline-variant"></div>
+<div class="flex items-center gap-3">
+<div class="flex -space-x-2">
+<img alt="" class="w-6 h-6 rounded-full border-2 border-surface" data-alt="Portrait of a male engineer profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLvOS9GlHh-F1Q3rZFqBMYrktJEUpMAtCvXYLGoZqcs804QXGdnTuhBnvQRJrtwohXCnRY1vIRvZMD-NRCLOqB_eenIQeuaM7lWm6ZFsoA9hZpPevmHLrbP0XOJIRTVlW26ECIuwVPS2X_mcR1-HQ3248yVBxR5EiMdgehHa6WQ8IpCtSXAwO5ZLYPBgtOVbtgZflf09AKXigwQdJ0iaAxhId2iZszQ0K9febMJOU1uXG4fV0Qq63yRXC83z4k-HM2wyq68gTfbhI"/>
+<img alt="" class="w-6 h-6 rounded-full border-2 border-surface" data-alt="Portrait of a female architect profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvXA1PDHXBnEpCwBI_QczJh-9FfrzHGFUYEtdOXC4omlo6umjex5D1uocQNrjijLLTYAnpG1jwF4WAEqIG07GuVk_Ya5n3VamkfWj5HTj_p0EVsUJxiVAE_HEJMoXDr5sNzww9ndgbs3bqep_UR8w-dmMF6FQXdi2Hiz6r50o_jr6j_2qQPLsFwA422Kcueov-6UoDGCJRTKkOYHZM6g7obyHmR582z3zAqO4xVtf3vvv-ucJT6FLa3V3N2MmN0Mr7bQ478_R9WxY"/>
+</div>
+<p class="text-[10px] font-medium text-on-surface-variant uppercase tracking-wider">Join 2,400+ Precision Engineers</p>
+</div>
+</div>
+</div>
+</main>
+<footer class="bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center w-full px-8 py-4 gap-4">
+<div class="text-[10px] font-medium uppercase tracking-widest text-slate-400 dark:text-slate-500">
+            © 2024 Blueprint Precision Engineering. Internal Use Only.
+        </div>
+<div class="flex gap-6">
+<a class="text-[10px] font-medium uppercase tracking-widest text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:ring-1 focus:ring-blue-500" href="#">Privacy Policy</a>
+<a class="text-[10px] font-medium uppercase tracking-widest text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:ring-1 focus:ring-blue-500" href="#">Terms of Service</a>
+<a class="text-[10px] font-medium uppercase tracking-widest text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:ring-1 focus:ring-blue-500" href="#">Security Architecture</a>
+</div>
+</footer>
+</body></html>

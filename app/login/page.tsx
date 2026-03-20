@@ -108,7 +108,7 @@ function LoginForm() {
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <label className="text-[10px] uppercase tracking-widest font-semibold text-slate-500" htmlFor="password">Password</label>
-                  <Link href="#" className="text-[10px] uppercase tracking-widest font-semibold text-primary hover:underline">Forgot?</Link>
+                  <Link href="/forgot-password" className="text-[10px] uppercase tracking-widest font-semibold text-primary hover:underline">Forgot?</Link>
                 </div>
                 <div className="relative group">
                   <input 

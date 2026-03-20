@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -10,6 +11,10 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [updatingPassword, setUpdatingPassword] = useState(false);
 
   const [profile, setProfile] = useState<{
     id: string;
@@ -73,22 +78,60 @@ export default function SettingsPage() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete your account? This action cannot be undone.")) return;
-    setDeleting(true);
+  const handleUpdatePassword = async () => {
+    if (!currentPassword || !newPassword) {
+      toast.error('Please fill in both password fields')
+      return
+    }
+    if (newPassword.length < 8) {
+      toast.error('New password must be at least 8 characters')
+      return
+    }
     try {
-      const res = await fetch("/api/auth/me", { method: "DELETE" });
-      const data = await res.json();
-      if (data.success) {
-        toast.success("Account deleted successfully");
-        router.push("/login");
+      setUpdatingPassword(true)
+      const res = await fetch('/api/auth/update-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      })
+      const d = await res.json()
+      if (res.ok) {
+        toast.success('Password updated successfully')
+        setCurrentPassword('')
+        setNewPassword('')
       } else {
-        toast.error(data.error || "Failed to delete account");
+        toast.error(d.error || 'Failed to update password')
       }
     } catch {
-      toast.error("Network error deleting account");
+      toast.error('Failed to update password')
     } finally {
-      setDeleting(false);
+      setUpdatingPassword(false)
+    }
+  }
+
+  const handleDeleteAccount = async () => {
+    const confirmed = window.confirm('Are you sure? This cannot be undone. All your files will be permanently deleted.')
+    if (!confirmed) return
+
+    try {
+      setDeleting(true)
+      const res = await fetch('/api/auth/delete', { method: 'DELETE' })
+
+      if (res.ok) {
+        localStorage.clear()
+        sessionStorage.clear()
+        const supabase = createSupabaseBrowserClient()
+        await supabase.auth.signOut()
+        toast.success('Account deleted')
+        window.location.href = '/login'
+      } else {
+        const d = await res.json()
+        toast.error(d.error || 'Failed to delete account')
+      }
+    } catch {
+      toast.error('Failed to delete account')
+    } finally {
+      setDeleting(false)
     }
   };
   
@@ -260,14 +303,14 @@ export default function SettingsPage() {
                     <div className="space-y-4">
                       <div className="space-y-2">
                         <label className="text-sm font-bold text-slate-700">Current Password</label>
-                        <input type="password" placeholder="••••••••" className="w-full md:w-3/4 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-900 focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" />
+                        <input type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} placeholder="Current password" className="w-full md:w-3/4 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-900 focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-bold text-slate-700">New Password</label>
-                        <input type="password" placeholder="••••••••" className="w-full md:w-3/4 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-900 focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" />
+                        <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="New password (min 8 characters)" className="w-full md:w-3/4 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-900 focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" />
                       </div>
                       <div className="pt-2">
-                         <button className="bg-white border border-slate-300 text-slate-700 px-6 py-2.5 rounded-lg font-bold text-sm shadow-sm hover:bg-slate-50 transition">Update Password</button>
+                         <button onClick={handleUpdatePassword} disabled={updatingPassword} className="bg-white border border-slate-300 text-slate-700 px-6 py-2.5 rounded-lg font-bold text-sm shadow-sm hover:bg-slate-50 transition">{updatingPassword ? 'Updating...' : 'Update Password'}</button>
                       </div>
                     </div>
                   </div>
@@ -290,7 +333,7 @@ export default function SettingsPage() {
                         <h4 className="font-bold text-red-800 text-sm">Delete Account</h4>
                         <p className="text-xs text-red-700/80 mt-1 max-w-md">Permanently wipe your profile and transfer all CAD file ownership to the Vault Admin. This action cannot be undone.</p>
                       </div>
-                      <button onClick={handleDelete} disabled={deleting || loading} className="bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm whitespace-nowrap transition-colors">
+                      <button onClick={handleDeleteAccount} disabled={deleting || loading} className="bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm whitespace-nowrap transition-colors">
                         {deleting ? "Deleting..." : "Delete Profile"}
                       </button>
                     </div>
