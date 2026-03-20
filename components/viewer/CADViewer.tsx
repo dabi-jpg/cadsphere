@@ -34,6 +34,27 @@ import {
   Loader2,
 } from "lucide-react";
 
+// ─── OCCT Engine Cache ───────────────────────────────────────────────
+let occtModule: any = null;
+
+async function getOcct() {
+  if (occtModule) return occtModule;
+
+  try {
+    const initOpenCascade = (await import("occt-import-js")).default;
+    occtModule = await initOpenCascade({
+      locateFile: (path: string) => {
+        if (path.endsWith(".wasm")) return "/occt-import-js.wasm";
+        return path;
+      },
+    });
+    return occtModule;
+  } catch (err) {
+    console.error("Failed to initialize OCCT:", err);
+    throw err;
+  }
+}
+
 // ─── Types ─────────────────────────────────────────────────────────────
 interface CADViewerProps {
   fileUrl: string;
@@ -366,76 +387,59 @@ export default function CADViewer({
           ext === ".iges"
         ) {
           try {
-            const initOpenCascade = (await import("occt-import-js")).default;
-            const occt = await initOpenCascade({
-              locateFile: (path: string) => {
-                if (path.endsWith(".wasm")) return "/occt-import-js.wasm";
-                return path;
-              },
-            });
+            const occt = await getOcct();
+            if (!occt) throw new Error("OCCT not initialized");
 
-            if (!occt) throw new Error("OCCT failed to initialize");
+            const fileBuffer = new Uint8Array(arrayBuffer);
+            const result =
+              ext === ".igs" || ext === ".iges"
+                ? occt.ReadIgesFile(fileBuffer, null)
+                : occt.ReadStepFile(fileBuffer, null);
 
-          const fileData = new Uint8Array(arrayBuffer);
-          const virtualFileName = `model${ext}`;
-          occt.FS.createDataFile("/", virtualFileName, fileData, true, true, true);
+            if (result && result.success && result.meshes && result.meshes.length > 0) {
+              for (const resultMesh of result.meshes) {
+                const geometry = new THREE.BufferGeometry();
 
-          const result =
-            ext === ".igs" || ext === ".iges"
-              ? occt.ReadIgesFile("/" + virtualFileName)
-              : occt.ReadStepFile("/" + virtualFileName);
-
-          if (result && result.meshes && result.meshes.length > 0) {
-            for (const resultMesh of result.meshes) {
-              const geometry = new THREE.BufferGeometry();
-
-              geometry.setAttribute(
-                "position",
-                new THREE.Float32BufferAttribute(resultMesh.attributes.position.array, 3)
-              );
-              if (resultMesh.attributes.normal) {
                 geometry.setAttribute(
-                  "normal",
-                  new THREE.Float32BufferAttribute(resultMesh.attributes.normal.array, 3)
+                  "position",
+                  new THREE.Float32BufferAttribute(resultMesh.attributes.position.array, 3)
                 );
-              } else {
-                geometry.computeVertexNormals();
+                if (resultMesh.attributes.normal) {
+                  geometry.setAttribute(
+                    "normal",
+                    new THREE.Float32BufferAttribute(resultMesh.attributes.normal.array, 3)
+                  );
+                } else {
+                  geometry.computeVertexNormals();
+                }
+
+                const index = Uint32Array.from(resultMesh.index.array);
+                geometry.setIndex(new THREE.BufferAttribute(index, 1));
+
+                const color = resultMesh.color
+                  ? new THREE.Color(resultMesh.color[0], resultMesh.color[1], resultMesh.color[2])
+                  : new THREE.Color(0x8888cc);
+
+                const material = new THREE.MeshPhysicalMaterial({
+                  color,
+                  metalness: 0.3,
+                  roughness: 0.4,
+                  side: THREE.DoubleSide,
+                });
+
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+                group.add(mesh);
               }
-
-              const index = Uint32Array.from(resultMesh.index.array);
-              geometry.setIndex(new THREE.BufferAttribute(index, 1));
-
-              const color = resultMesh.color
-                ? new THREE.Color(resultMesh.color[0], resultMesh.color[1], resultMesh.color[2])
-                : new THREE.Color(0x8888cc);
-
-              const material = new THREE.MeshPhysicalMaterial({
-                color,
-                metalness: 0.3,
-                roughness: 0.4,
-                side: THREE.DoubleSide,
-              });
-
-              const mesh = new THREE.Mesh(geometry, material);
-              mesh.castShadow = true;
-              mesh.receiveShadow = true;
-              group.add(mesh);
+            } else {
+              throw new Error(`Failed to parse ${ext.toUpperCase()} file — ${result?.error || "no meshes found"}`);
             }
-          } else {
-            throw new Error(`Failed to parse ${ext.toUpperCase()} file — no meshes found`);
+          } catch (err) {
+            console.error("OCCT error:", err);
+            throw new Error("Failed to load 3D engine. Please try refreshing.");
           }
-
-          // Cleanup virtual FS
-          try {
-            occt.FS.unlink("/" + virtualFileName);
-          } catch {
-            // Ignore cleanup errors
-          }
-        } catch (err) {
-          console.error("OCCT error:", err);
-          throw new Error("Failed to load 3D engine. Please try refreshing.");
-        }
-      } else {
+        } else {
           throw new Error(`Unsupported file format: ${ext}`);
         }
 

@@ -70,6 +70,11 @@ const nextConfig: NextConfig = {
     config.resolve.fallback = {
       ...config.resolve.fallback,
       fs: false,
+      path: false,
+    };
+    config.experiments = {
+      ...config.experiments,
+      asyncWebAssembly: true,
     };
     return config;
   },
