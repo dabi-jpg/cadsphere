@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "node -e \"const fs=require('fs'); fs.copyFileSync('node_modules/occt-import-js/dist/occt-import-js.wasm','public/occt-import-js.wasm'); fs.copyFileSync('node_modules/occt-import-js/dist/occt-import-js.js','public/occt-import-js.js');\""
+    "postinstall": "node -e \"const fs=require('fs'); try { fs.copyFileSync('node_modules/occt-import-js/dist/occt-import-js.wasm','public/occt-import-js.wasm'); fs.copyFileSync('node_modules/occt-import-js/dist/occt-import-js.js','public/occt-import-js.js'); } catch(e) { console.log('Copy failed:', e.message); }\""
   },
   "dependencies": {
     "@base-ui/react": "^1.2.0",
